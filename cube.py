@@ -125,7 +125,7 @@ class RubiksCube:
     def face_cycle(self: RubiksCube, rotation_instructions: list[int]):
         self.turn_library[rotation_instructions[0]], self.turn_library[rotation_instructions[1]], self.turn_library[rotation_instructions[2]], self.turn_library[rotation_instructions[3]] = self.turn_library[rotation_instructions[3]], self.turn_library[rotation_instructions[0]], self.turn_library[rotation_instructions[1]], self.turn_library[rotation_instructions[2]]
 
-    def sequence(self: RubiksCube, seq: str):
+    def sequence(self: RubiksCube, seq: str, verbose = False):
         for i, x in enumerate(seq):
             is_last: bool = (i == len(seq) - 1)
             move = "udfbrlxyz".find(x.lower())*3
@@ -133,9 +133,9 @@ class RubiksCube:
                 move += 1 * (seq[i+1] == "2")
                 move += 2 * (seq[i+1] == "'")
             if x.lower() in "udfbrl":       
-                self.turn(Turn(move))
+                self.turn(Turn(move), verbose=verbose)
             elif x.lower() in "xyz":
-                self.rotate(Turn(move))
+                self.rotate(Turn(move), verbose=verbose)
 
 
 
