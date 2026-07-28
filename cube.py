@@ -116,7 +116,6 @@ class RubiksCube:
 
     def rotate(self: RubiksCube, rot: Turn, verbose: bool = False):
         rot_type: int = rot.value % 3
-        print(rot_type)
         rot_instructions: list[int] = self.rotation_library[floor(rot.value/3) - 6]
         for _ in range(rot_type + 1):
             self.face_cycle(rot_instructions)
