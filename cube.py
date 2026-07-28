@@ -2,7 +2,6 @@ from enum import Enum
 from copy import deepcopy
 from termcolor import colored
 from math import floor
-colors = ["white", "light_yellow", "green", "blue", "red", (255, 165, 0)]
 
 def main():
     cube: RubiksCube = RubiksCube()
@@ -36,17 +35,23 @@ class RubiksCube:
             Corner(CP.YBO, C.YELLOW, C.BLUE, C.ORANGE)
         ])
 
-        self.display = [[(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (1, CP.WBO, 0), (0, EP.WB, 0), (1, CP.WBR, 0)],
-                        [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (0, EP.WO, 0), (2, C.WHITE, 0), (0, EP.WR, 0)],
-                        [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (1, CP.WGO, 0), (0, EP.WG, 0), (1, CP.WGR, 0)],
+        self.colors = ["white", "light_yellow", "green", "blue", "red", (255, 165, 0)]
 
-                        [(1, CP.WBO, 1), (0, EP.WO, 1), (1, CP.WGO, 2),   (1, CP.WGO, 1), (0, EP.WG, 1), (1, CP.WGR, 2),   (1, CP.WGR, 1), (0, EP.WR, 1), (1, CP.WBR, 2),   (1, CP.WBR, 1), (0, EP.WB, 1), (1, CP.WBO, 2)],
-                        [(0, EP.BO, 1), (2, C.ORANGE, 0), (0, EP.GO, 1),   (0, EP.GO, 0), (2, C.GREEN, 0), (0, EP.GR, 0),   (0, EP.GR, 1), (2, C.RED, 0), (0, EP.BR, 1),   (0, EP.BR, 0), (2, C.BLUE, 0), (0, EP.BO, 0)],
-                        [(1, CP.YBO, 2), (0, EP.YO, 1), (1, CP.YGO, 1),   (1, CP.YGO, 2), (0, EP.YG, 1), (1, CP.YGR, 1),   (1, CP.YGR, 2), (0, EP.YR, 1), (1, CP.YBR, 1),   (1, CP.YBR, 2), (0, EP.YB, 1), (1, CP.YBO, 1)],
+        self.display = [[(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (1, CP.WBO, 0), (0, EP.WB, 0), (1, CP.WBR, 0)],
+                        [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (0, EP.WO, 0), (2, C.WHITE, 0), (0, EP.WR, 0)],
+                        [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (1, CP.WGO, 0), (0, EP.WG, 0), (1, CP.WGR, 0)],
 
-                        [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (1, CP.YGO, 0), (0, EP.YG, 0), (1, CP.YGR, 0)],
-                        [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (0, EP.YO, 0), (2, C.YELLOW, 0), (0, EP.YR, 0)],
-                        [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (1, CP.YBO, 0), (0, EP.YB, 0), (1, CP.YBR, 0)],
+                        [],
+
+                        [(1, CP.WBO, 1), (0, EP.WO, 1), (1, CP.WGO, 2),  (-1, 0, 0),  (1, CP.WGO, 1), (0, EP.WG, 1), (1, CP.WGR, 2),  (-1, 0, 0),  (1, CP.WGR, 1), (0, EP.WR, 1), (1, CP.WBR, 2),  (-1, 0, 0),  (1, CP.WBR, 1), (0, EP.WB, 1), (1, CP.WBO, 2)],
+                        [(0, EP.BO, 1), (2, C.ORANGE, 0), (0, EP.GO, 1),  (-1, 0, 0),  (0, EP.GO, 0), (2, C.GREEN, 0), (0, EP.GR, 0),  (-1, 0, 0),  (0, EP.GR, 1), (2, C.RED, 0), (0, EP.BR, 1),  (-1, 0, 0),  (0, EP.BR, 0), (2, C.BLUE, 0), (0, EP.BO, 0)],
+                        [(1, CP.YBO, 2), (0, EP.YO, 1), (1, CP.YGO, 1),  (-1, 0, 0),  (1, CP.YGO, 2), (0, EP.YG, 1), (1, CP.YGR, 1),  (-1, 0, 0),  (1, CP.YGR, 2), (0, EP.YR, 1), (1, CP.YBR, 1),  (-1, 0, 0),  (1, CP.YBR, 2), (0, EP.YB, 1), (1, CP.YBO, 1)],
+
+                        [],
+
+                        [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (1, CP.YGO, 0), (0, EP.YG, 0), (1, CP.YGR, 0)],
+                        [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (0, EP.YO, 0), (2, C.YELLOW, 0), (0, EP.YR, 0)],
+                        [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (1, CP.YBO, 0), (0, EP.YB, 0), (1, CP.YBR, 0)],
                         ]
 
         self.turn_library: list[tuple[list[tuple]]] = [
@@ -69,10 +74,10 @@ class RubiksCube:
                         value += "  "
                     # edge and corner
                     case 0 | 1:
-                        value += colored("■ ", colors[self.get_sticker(piece_variety, piece, offset).value])
+                        value += colored("■ ", self.colors[self.get_sticker(piece_variety, piece, offset).value])
                     # center
                     case 2:
-                        value += colored("■ ", colors[piece.value])
+                        value += colored("■ ", self.colors[piece.value])
             value += "\n"
         print(value)
 
@@ -97,7 +102,6 @@ class RubiksCube:
     def turn(self, turn: Turn):
         turn_type: int = turn.value % 3
         turn_instructions: tuple[list[tuple]] = self.turn_library[floor(turn.value/3)]
-        print(turn_instructions[1])
         for _ in range(turn_type + 1):
             self.cycle(0, *turn_instructions[0])
             self.cycle(1, *turn_instructions[1])
