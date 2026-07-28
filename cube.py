@@ -5,11 +5,11 @@ from math import floor
 
 def main():
     cube: RubiksCube = RubiksCube()
-    cube.turn(Turn.L)
+    cube.sequence("R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R")
     cube.show()
 
 class RubiksCube:
-    def __init__(self):
+    def __init__(self: RubiksCube):
         self.cube: tuple(list[Piece]) = ([
             Edge(EP.WB, C.WHITE, C.BLUE),
             Edge(EP.WR, C.WHITE, C.RED),
@@ -63,7 +63,7 @@ class RubiksCube:
             (((EP.WO, 1), (EP.GO, 1), (EP.YO, 1), (EP.BO, 1)), ((CP.WBO, 1), (CP.WGO, 2), (CP.YGO, 1), (CP.YBO, 2)))  #L
         ]
 
-    def show(self):
+    def show(self: RubiksCube):
         value = ""
         for row in self.display:
             for item in row:
@@ -81,14 +81,14 @@ class RubiksCube:
             value += "\n"
         print(value)
 
-    def get_sticker(self, variety: int, piece: int, offset: int):
+    def get_sticker(self: RubiksCube, variety: int, piece: int, offset: int):
         found_piece: Piece = self.cube[variety][piece.value]
         return found_piece.stickers[(found_piece.rotation + offset) % found_piece.size]
     
-    def get_piece(self, variety: int, piece: int):
+    def get_piece(self: RubiksCube, variety: int, piece: int):
         return self.cube[variety][piece.value]
 
-    def cycle(self, variety: int, *stickers: tuple):
+    def cycle(self: RubiksCube, variety: int, *stickers: tuple):
         # either all edges or all corners
         group: list[Edge | Corner] = self.cube[variety]
         last: Edge | Corner = deepcopy(group[stickers[-1][0].value])
@@ -99,12 +99,22 @@ class RubiksCube:
         last.rotation = (last.rotation + stickers[-1][1] - stickers[0][1]) % len(last.stickers)
         group[stickers[0][0].value] = last
 
-    def turn(self, turn: Turn):
+    def turn(self: RubiksCube, turn: Turn):
         turn_type: int = turn.value % 3
         turn_instructions: tuple[list[tuple]] = self.turn_library[floor(turn.value/3)]
         for _ in range(turn_type + 1):
             self.cycle(0, *turn_instructions[0])
             self.cycle(1, *turn_instructions[1])
+
+    def sequence(self: RubiksCube, seq: str):
+        for i, x in enumerate(seq):
+            is_last: bool = (i == len(seq) - 1)
+            if x.lower() in "udfbrl":
+                move = "udfbrl".index(x.lower())*3
+                if not is_last:
+                    move += 1 * (seq[i+1] == "2")
+                    move += 2 * (seq[i+1] == "'")
+                self.turn(Turn(move))
 
 
 
