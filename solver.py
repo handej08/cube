@@ -1,9 +1,9 @@
 
-from cube import *
+from cube import RubiksCube, EP, CP, Turn
 
 def main():
     cube: SmartCube = SmartCube()
-    cube.sequence("D B2 L2 D2 B D2 U2 L2 D2 F2 D2 B L' D' R2 D L' B' L'")
+    cube.sequence("U2 F' B2 U2 R2 D2 R2 D R2 D B2 D' R2 F2 B' L D R2 F R' F")
 
     cube.show()
     cube.cross()
@@ -19,8 +19,7 @@ class SmartCube(RubiksCube):
         for i, p in enumerate(self.cube[variety]):
             if p.id == piece:
                 return (EP(i), p) if variety == 0 else (CP(i), p)
-    
-            
+             
     def cross_score(self: SmartCube) -> tuple:
         cross_pieces = [self.find_piece(0, EP.WB), self.find_piece(0, EP.WR), self.find_piece(0, EP.WG), self.find_piece(0, EP.WO)]
         scores = [-1 for _ in cross_pieces]
@@ -36,9 +35,9 @@ class SmartCube(RubiksCube):
                 if p[1].rotation == 0:
                     scores[i] = 2
                 else:
-                    scores[i] = 3
+                    scores[i] = 4
             else:
-                scores[i] = 4
+                scores[i] = 3
         return cross_pieces, scores
         
 
@@ -62,17 +61,8 @@ class SmartCube(RubiksCube):
                     while self.find_piece(0, target_piece[1].id)[0].name[1] != target_piece[1].id.name[1]:
                         self.turn(Turn.D, verbose=True)
                     self.turn(Turn(self.color_order.index(target_piece[1].id.name[1])*3+1), verbose=True)
-                case 3:
-                    
-                    while self.find_piece(0, target_piece[1].id)[0].name[1] == target_piece[1].id.name[1] or self.find_piece(0, target_piece[1].id)[0].name[1] == self.color_opposites[target_piece[1].id.name[1]]:
-                        self.turn(Turn.D, verbose=True)
-                    side: Turn = Turn(self.color_order.index(self.find_piece(0, target_piece[1].id)[0].name[1])*3)
-                    while target_piece[1].id.name[1] not in self.find_piece(0, target_piece[1].id)[0].name:
-                        self.turn(side, verbose=True)
-                    while self.find_piece(0, target_piece[1].id)[0] != target_piece[1].id:
-                            self.turn(Turn(self.color_order.index(target_piece[1].id.name[1])*3), verbose=True)
 
-                case 4:
+                case 3:
                     side_color: str = target_piece[0].name[int(not bool(target_piece[1].rotation))]
                     piece_to_replace: EP = self.cube[0][target_piece[1].id.value].id
                     rotations = 0
@@ -83,6 +73,18 @@ class SmartCube(RubiksCube):
                         self.turn(Turn(self.color_order.index(side_color)*3), verbose=True)
                     for _ in range(rotations):
                         self.turn(Turn.U_, verbose=True)
+                        
+                case 4:
+                    
+                    while self.find_piece(0, target_piece[1].id)[0].name[1] == target_piece[1].id.name[1] or self.find_piece(0, target_piece[1].id)[0].name[1] == self.color_opposites[target_piece[1].id.name[1]]:
+                        self.turn(Turn.D, verbose=True)
+                    side: Turn = Turn(self.color_order.index(self.find_piece(0, target_piece[1].id)[0].name[1])*3)
+                    while target_piece[1].id.name[1] not in self.find_piece(0, target_piece[1].id)[0].name:
+                        self.turn(side, verbose=True)
+                    while self.find_piece(0, target_piece[1].id)[0] != target_piece[1].id:
+                        self.turn(Turn(self.color_order.index(target_piece[1].id.name[1])*3), verbose=True)
+
+
 
                 case 5:
                     side_color: str = target_piece[0].name[1]
