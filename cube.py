@@ -5,7 +5,7 @@ from math import floor
 
 def main():
     cube: RubiksCube = RubiksCube()
-    cube.sequence("R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R")
+    cube.sequence("R2 D2 B2 D' L2 D2 L2 D2 R2 F2 R F R' B' L D2 F' D2 R2 F2")
     cube.show()
 
 class RubiksCube:
@@ -99,12 +99,14 @@ class RubiksCube:
         last.rotation = (last.rotation + stickers[-1][1] - stickers[0][1]) % len(last.stickers)
         group[stickers[0][0].value] = last
 
-    def turn(self: RubiksCube, turn: Turn):
+    def turn(self: RubiksCube, turn: Turn, verbose: bool = False):
         turn_type: int = turn.value % 3
         turn_instructions: tuple[list[tuple]] = self.turn_library[floor(turn.value/3)]
         for _ in range(turn_type + 1):
             self.cycle(0, *turn_instructions[0])
             self.cycle(1, *turn_instructions[1])
+        if verbose:
+            print(turn.name.replace("_", "'"))
 
     def sequence(self: RubiksCube, seq: str):
         for i, x in enumerate(seq):
