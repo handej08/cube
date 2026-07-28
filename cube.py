@@ -117,11 +117,14 @@ class RubiksCube:
     def rotate(self: RubiksCube, rot: Turn, verbose: bool = False):
         rot_type: int = rot.value % 3
         print(rot_type)
-        rot_instructions: tuple[list[tuple]] = self.rotation_library[floor(rot.value/3) - 6]
+        rot_instructions: list[int] = self.rotation_library[floor(rot.value/3) - 6]
         for _ in range(rot_type + 1):
-            self.turn_library[rot_instructions[0]], self.turn_library[rot_instructions[1]], self.turn_library[rot_instructions[2]], self.turn_library[rot_instructions[3]] = self.turn_library[rot_instructions[3]], self.turn_library[rot_instructions[0]], self.turn_library[rot_instructions[1]], self.turn_library[rot_instructions[2]]
+            self.face_cycle(rot_instructions)
         if verbose:
             print(rot.name.replace("_", "'"))
+
+    def face_cycle(self: RubiksCube, rotation_instructions: list[int]):
+        self.turn_library[rotation_instructions[0]], self.turn_library[rotation_instructions[1]], self.turn_library[rotation_instructions[2]], self.turn_library[rotation_instructions[3]] = self.turn_library[rotation_instructions[3]], self.turn_library[rotation_instructions[0]], self.turn_library[rotation_instructions[1]], self.turn_library[rotation_instructions[2]]
 
     def sequence(self: RubiksCube, seq: str):
         for i, x in enumerate(seq):

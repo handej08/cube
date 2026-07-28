@@ -19,6 +19,10 @@ class SmartCube(RubiksCube):
         for i, p in enumerate(self.cube[variety]):
             if p.id == piece:
                 return (EP(i), p) if variety == 0 else (CP(i), p)
+
+    def face_cycle(self, rotation_instructions):
+        super().face_cycle(rotation_instructions)
+        self.color_order[rotation_instructions[0]], self.color_order[rotation_instructions[1]], self.color_order[rotation_instructions[2]], self.color_order[rotation_instructions[3]] = self.color_order[rotation_instructions[3]], self.color_order[rotation_instructions[0]], self.color_order[rotation_instructions[1]], self.color_order[rotation_instructions[2]]
              
     def cross_score(self: SmartCube) -> tuple:
         cross_pieces = [self.find_piece(0, EP.WB), self.find_piece(0, EP.WR), self.find_piece(0, EP.WG), self.find_piece(0, EP.WO)]
@@ -73,7 +77,7 @@ class SmartCube(RubiksCube):
                         self.turn(Turn(self.color_order.index(side_color)*3), verbose=True)
                     for _ in range(rotations):
                         self.turn(Turn.U_, verbose=True)
-                        
+
                 case 4:
                     
                     while self.find_piece(0, target_piece[1].id)[0].name[1] == target_piece[1].id.name[1] or self.find_piece(0, target_piece[1].id)[0].name[1] == self.color_opposites[target_piece[1].id.name[1]]:
@@ -89,7 +93,6 @@ class SmartCube(RubiksCube):
                 case 5:
                     side_color: str = target_piece[0].name[1]
                     self.turn(Turn(self.color_order.index(side_color)*3), verbose=True)
-
 
 
 
