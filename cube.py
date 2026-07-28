@@ -55,12 +55,18 @@ class RubiksCube:
                         ]
 
         self.turn_library: list[tuple[list[tuple]]] = [
-            (((EP.WG, 0), (EP.WO, 0), (EP.WB, 0), (EP.WR, 0)), ((CP.WGR, 0), (CP.WGO, 0), (CP.WBO, 0), (CP.WBR, 0))), #U
-            (((EP.YG, 0), (EP.YR, 0), (EP.YB, 0), (EP.YO, 0)), ((CP.YGR, 0), (CP.YBR, 0), (CP.YBO, 0), (CP.YGO, 0))), #D
-            (((EP.WG, 1), (EP.GR, 0), (EP.YG, 1), (EP.GO, 0)), ((CP.WGO, 1), (CP.WGR, 2), (CP.YGR, 1), (CP.YGO, 2))), #F
-            (((EP.WB, 1), (EP.BO, 0), (EP.YB, 1), (EP.BR, 0)), ((CP.WBR, 1), (CP.WBO, 2), (CP.YBO, 1), (CP.YBR, 2))), #B
-            (((EP.GR, 1), (EP.WR, 1), (EP.BR, 1), (EP.YR, 1)), ((CP.WGR, 1), (CP.WBR, 2), (CP.YBR, 1), (CP.YGR, 2))), #R
-            (((EP.WO, 1), (EP.GO, 1), (EP.YO, 1), (EP.BO, 1)), ((CP.WBO, 1), (CP.WGO, 2), (CP.YGO, 1), (CP.YBO, 2)))  #L
+            (((EP.WG, 0), (EP.WO, 0), (EP.WB, 0), (EP.WR, 0)), ((CP.WGR, 0), (CP.WGO, 0), (CP.WBO, 0), (CP.WBR, 0))), #U 0
+            (((EP.YG, 0), (EP.YR, 0), (EP.YB, 0), (EP.YO, 0)), ((CP.YGR, 0), (CP.YBR, 0), (CP.YBO, 0), (CP.YGO, 0))), #D 1
+            (((EP.WG, 1), (EP.GR, 0), (EP.YG, 1), (EP.GO, 0)), ((CP.WGO, 1), (CP.WGR, 2), (CP.YGR, 1), (CP.YGO, 2))), #F 2
+            (((EP.WB, 1), (EP.BO, 0), (EP.YB, 1), (EP.BR, 0)), ((CP.WBR, 1), (CP.WBO, 2), (CP.YBO, 1), (CP.YBR, 2))), #B 3
+            (((EP.GR, 1), (EP.WR, 1), (EP.BR, 1), (EP.YR, 1)), ((CP.WGR, 1), (CP.WBR, 2), (CP.YBR, 1), (CP.YGR, 2))), #R 4
+            (((EP.WO, 1), (EP.GO, 1), (EP.YO, 1), (EP.BO, 1)), ((CP.WBO, 1), (CP.WGO, 2), (CP.YGO, 1), (CP.YBO, 2)))  #L 5
+        ]
+
+        self.rotation_library: list[list[int]] = [
+            [2, 0, 3, 1], #X
+            [2, 5, 3, 4], #Y
+            [0, 4, 1, 5]  #Z
         ]
 
     def show(self: RubiksCube):
@@ -108,15 +114,26 @@ class RubiksCube:
         if verbose:
             print(turn.name.replace("_", "'"))
 
+    def rotate(self: RubiksCube, rot: Turn, verbose: bool = False):
+        rot_type: int = rot.value % 3
+        print(rot_type)
+        rot_instructions: tuple[list[tuple]] = self.rotation_library[floor(rot.value/3) - 6]
+        for _ in range(rot_type + 1):
+            self.turn_library[rot_instructions[0]], self.turn_library[rot_instructions[1]], self.turn_library[rot_instructions[2]], self.turn_library[rot_instructions[3]] = self.turn_library[rot_instructions[3]], self.turn_library[rot_instructions[0]], self.turn_library[rot_instructions[1]], self.turn_library[rot_instructions[2]]
+        if verbose:
+            print(rot.name.replace("_", "'"))
+
     def sequence(self: RubiksCube, seq: str):
         for i, x in enumerate(seq):
             is_last: bool = (i == len(seq) - 1)
-            if x.lower() in "udfbrl":
-                move = "udfbrl".index(x.lower())*3
-                if not is_last:
-                    move += 1 * (seq[i+1] == "2")
-                    move += 2 * (seq[i+1] == "'")
+            move = "udfbrlxyz".find(x.lower())*3
+            if not is_last:
+                move += 1 * (seq[i+1] == "2")
+                move += 2 * (seq[i+1] == "'")
+            if x.lower() in "udfbrl":       
                 self.turn(Turn(move))
+            elif x.lower() in "xyz":
+                self.rotate(Turn(move))
 
 
 
@@ -173,6 +190,16 @@ class Turn(Enum):
     L = 15
     L2 = 16
     L_ = 17
+
+    X = 18
+    X2 = 19
+    X_ = 20
+    Y = 21
+    Y2 = 22
+    Y_ = 23
+    Z = 24
+    Z2 = 25
+    Z_ = 26
 
 class Piece:
     def __init__(self, id: EP | CP, *stickers: list, rotation = 0):
