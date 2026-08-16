@@ -104,6 +104,11 @@ class RubiksCube:
         if len(self.turn_tape) > 1024:
             self.turn_tape = self.turn_tape[len(self.turn_tape)-1024:1024]
 
+    def pop_turn_tape(self: RubiksCube) -> str:
+        ret: str = self.turn_tape
+        self.turn_tape = ""
+        return ret
+
     def get_sticker(self: RubiksCube, variety: int, piece: int, offset: int):
         found_piece: Piece = self.cube[variety][piece.value]
         return found_piece.stickers[(found_piece.rotation + offset) % found_piece.size]
