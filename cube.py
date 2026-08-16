@@ -35,8 +35,10 @@ class RubiksCube:
             Corner(CP.YBO, C.YELLOW, C.BLUE, C.ORANGE)
         ])
 
+        #values to display
         self.colors = ["white", "light_yellow", "green", "blue", "red", (255, 165, 0)]
 
+        # for every pixel in display: type, piece, sticker
         self.display = [[(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (1, CP.WBO, 0), (0, EP.WB, 0), (1, CP.WBR, 0)],
                         [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (0, EP.WO, 0), (2, C.WHITE, 0), (0, EP.WR, 0)],
                         [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (1, CP.WGO, 0), (0, EP.WG, 0), (1, CP.WGR, 0)],
@@ -52,17 +54,25 @@ class RubiksCube:
                         [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (1, CP.YGO, 0), (0, EP.YG, 0), (1, CP.YGR, 0)],
                         [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (0, EP.YO, 0), (2, C.YELLOW, 0), (0, EP.YR, 0)],
                         [(-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (1, CP.YBO, 0), (0, EP.YB, 0), (1, CP.YBR, 0)],
+
+                        []
                         ]
 
-        self.turn_library: list[tuple[list[tuple]]] = [
-            (((EP.WG, 0), (EP.WO, 0), (EP.WB, 0), (EP.WR, 0)), ((CP.WGR, 0), (CP.WGO, 0), (CP.WBO, 0), (CP.WBR, 0))), #U 0
-            (((EP.YG, 0), (EP.YR, 0), (EP.YB, 0), (EP.YO, 0)), ((CP.YGR, 0), (CP.YBR, 0), (CP.YBO, 0), (CP.YGO, 0))), #D 1
-            (((EP.WG, 1), (EP.GR, 0), (EP.YG, 1), (EP.GO, 0)), ((CP.WGO, 1), (CP.WGR, 2), (CP.YGR, 1), (CP.YGO, 2))), #F 2
-            (((EP.WB, 1), (EP.BO, 0), (EP.YB, 1), (EP.BR, 0)), ((CP.WBR, 1), (CP.WBO, 2), (CP.YBO, 1), (CP.YBR, 2))), #B 3
-            (((EP.GR, 1), (EP.WR, 1), (EP.BR, 1), (EP.YR, 1)), ((CP.WGR, 1), (CP.WBR, 2), (CP.YBR, 1), (CP.YGR, 2))), #R 4
-            (((EP.WO, 1), (EP.GO, 1), (EP.YO, 1), (EP.BO, 1)), ((CP.WBO, 1), (CP.WGO, 2), (CP.YGO, 1), (CP.YBO, 2)))  #L 5
+        self.turn_library: list[list[tuple[list[tuple]]]] = [
+            ["U", (((EP.WG, 0), (EP.WO, 0), (EP.WB, 0), (EP.WR, 0)), ((CP.WGR, 0), (CP.WGO, 0), (CP.WBO, 0), (CP.WBR, 0)))], #U 0
+            ["D", (((EP.YG, 0), (EP.YR, 0), (EP.YB, 0), (EP.YO, 0)), ((CP.YGR, 0), (CP.YBR, 0), (CP.YBO, 0), (CP.YGO, 0)))], #D 1
+            ["F", (((EP.WG, 1), (EP.GR, 0), (EP.YG, 1), (EP.GO, 0)), ((CP.WGO, 1), (CP.WGR, 2), (CP.YGR, 1), (CP.YGO, 2)))], #F 2
+            ["B", (((EP.WB, 1), (EP.BO, 0), (EP.YB, 1), (EP.BR, 0)), ((CP.WBR, 1), (CP.WBO, 2), (CP.YBO, 1), (CP.YBR, 2)))], #B 3
+            ["R", (((EP.GR, 1), (EP.WR, 1), (EP.BR, 1), (EP.YR, 1)), ((CP.WGR, 1), (CP.WBR, 2), (CP.YBR, 1), (CP.YGR, 2)))], #R 4
+            ["L", (((EP.WO, 1), (EP.GO, 1), (EP.YO, 1), (EP.BO, 1)), ((CP.WBO, 1), (CP.WGO, 2), (CP.YGO, 1), (CP.YBO, 2)))], #L 5
         ]
 
+        self.sides: str = "UDFBRL"
+
+        #absolute turns made
+        self.turn_tape: str = ""
+
+        #swapping guide for rotation
         self.rotation_library: list[list[int]] = [
             [2, 0, 3, 1], #X
             [2, 5, 3, 4], #Y
@@ -87,6 +97,13 @@ class RubiksCube:
             value += "\n"
         print(value)
 
+    def record_turn(self: RubiksCube, turn: Turn):
+        #records absolute turn
+        self.turn_tape += f"{(turn.name.replace(turn.name[0], self.turn_library[self.sides.index(turn.name[0])][0])).replace("_", "'")} "
+
+        if len(self.turn_tape) > 1024:
+            self.turn_tape = self.turn_tape[len(self.turn_tape)-1024:1024]
+
     def get_sticker(self: RubiksCube, variety: int, piece: int, offset: int):
         found_piece: Piece = self.cube[variety][piece.value]
         return found_piece.stickers[(found_piece.rotation + offset) % found_piece.size]
@@ -107,12 +124,14 @@ class RubiksCube:
 
     def turn(self: RubiksCube, turn: Turn, verbose: bool = False):
         turn_type: int = turn.value % 3
-        turn_instructions: tuple[list[tuple]] = self.turn_library[floor(turn.value/3)]
+        turn_instructions: tuple[list[tuple]] = self.turn_library[floor(turn.value/3)][1]
         for _ in range(turn_type + 1):
             self.cycle(0, *turn_instructions[0])
             self.cycle(1, *turn_instructions[1])
         if verbose:
             print(turn.name.replace("_", "'"))
+
+        self.record_turn(turn)
 
     def rotate(self: RubiksCube, rot: Turn, verbose: bool = False):
         rot_type: int = rot.value % 3

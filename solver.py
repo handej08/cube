@@ -6,7 +6,8 @@ def main():
     cube: SmartCube = SmartCube()
     #cube.sequence("Z2 R U R' U' L' U' L U U2 F U' F' U F' U F")
     #cube.sequence("L' D L")
-    print(cube.scramble())
+    print(f"Scramble: {cube.scramble()}")
+    print(cube.turn_tape)
 
     cube.show()
     cube.cross()
