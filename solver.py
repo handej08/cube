@@ -3,17 +3,70 @@ from cube import RubiksCube, EP, CP, Turn
 
 def main():
     cube: SmartCube = SmartCube()
-    cube.sequence("U2 F' B2 U2 R2 D2 R2 D R2 D B2 D' R2 F2 B' L D R2 F R' F")
+    cube.sequence("D' L R2 B2 L2 B2 R' U2 R U2 F2 U2 D F U' L' B F D' R'")
+    #cube.sequence("L' D L")
 
     cube.show()
     cube.cross()
+    cube.show()
+    cube.f2l()
     cube.show()
 
 class SmartCube(RubiksCube):
     def __init__(self: SmartCube):
         super().__init__()
-        self.color_order = ["W", "Y", "G", "B", "R", "O"]
-        self.color_opposites = {"W": "Y", "Y": "W", "G": "B", "B": "G", "R": "O", "O": "R"}
+        self.color_order: list[str] = ["W", "Y", "G", "B", "R", "O"]
+        self.color_opposites: dict[str] = {"W": "Y", "Y": "W", "G": "B", "B": "G", "R": "O", "O": "R"}
+
+        self.f2l_order: list[str] = ["G", "O", "B", "R"]
+
+        self.f2l_sides: dict[tuple[EP | CP | int]] = {
+            # edge corner major/minor
+            "G": (EP.GO, CP.WGO, 1),
+            "O": (EP.BO, CP.WBO, 0),
+            "B": (EP.BR, CP.WBR, 1),
+            "R": (EP.GR, CP.WGR, 0)
+        }
+
+        """self.f2l_relatives: dict[tuple[list[EP | CP]]] = {
+            "G": ([EP.YB, EP.YO, EP.YG, EP.YR, EP.GR, EP.GO, EP.BO, EP.BR], [CP.YBR, CP.YBO, CP.YGO, CP.YGR, CP.WGR, CP.WGO, CP.WBO, CP.WBR]),
+            "O": ([EP.YR, EP.YB, EP.YO, EP.YG, EP.GR, EP.GO, EP.BO, EP.BR])
+            "B": [],
+            "R": []
+        }"""
+
+        self.f2l_relatives : list[list[EP | CP]] = [[EP.YB, EP.YO, EP.YG, EP.YR, EP.GR, EP.GO, EP.BO, EP.BR], [CP.YBR, CP.YBO, CP.YGO, CP.YGR, CP.WGR, CP.WGO, CP.WBO, CP.WBR]]
+
+        self.f2l_library: dict[tuple] = {
+            (5, 0, 5, 0): "",
+
+            (3, 0, 2, 0): "y F R U2 R' F' y'",
+            (0, 1, 2, 0): "F' L' U2 L F",
+            (0, 0, 2, 0): "U (R U2 R') U (R U' R')",
+            (3, 1, 2, 0): "y U' (L' U2 L) U' (L' U L) y'",
+            (2, 0, 2, 0): "U (F R' F' R) U (R U R')",
+            (1, 1, 2, 0): "F (U R U' R') F' (R U' R')",
+            (1, 0, 2, 0): "(R U2 R') U' (R U R')",
+            (2, 1, 2, 0): "y (L' U2 L) U (L' U' L) y'",
+
+            (0, 0, 2, 2): "(R U R')",
+            (3, 1, 2, 1): "y (L' U' L) y'",
+            (3, 0, 2, 2): "U' (R U R') U (R U R')",
+            (0, 1, 2, 1): "y U (L' U' L) U' (L' U' L) y'",
+            (2, 0, 2, 2): "R' U2 R2 U R2 U R",
+            (1, 1, 2, 1): "y L U2 L2 U' L2 U' L' y'",
+            (1, 0, 2, 2): "U' (R U' R') U (R U R')",
+            (2, 1, 2, 1): "y U (L' U L) U' (L' U' L) y'",
+
+            (2, 1, 2, 2): "y U' (L' U L) y'",
+            (1, 0, 2, 1): "U (R U' R')",
+            (0, 1, 2, 2): "y U (L' U2 L) U2 (L' U L) y'",
+            (3, 0, 2, 1): "U' (R U2 R') U2 (R U' R')",
+            (0, 0, 2, 1): "U' (R U R') U2 (R U' R')",
+            (3, 1, 2, 2): "y U (L' U' L) U2 (L' U L) y'",
+            (2, 0, 2, 1): "y (L' U L) y' U2 (R U R')",
+            (1, 1, 2, 2): "(R U' R') y U2 (L' U' L) y'",
+        }
 
     def find_piece(self: SmartCube, variety: int, piece: EP | CP) -> tuple:
         for i, p in enumerate(self.cube[variety]):
@@ -44,8 +97,6 @@ class SmartCube(RubiksCube):
                 scores[i] = 3
         return cross_pieces, scores
         
-
-
 
     def cross(self: SmartCube):
         while True:
@@ -93,6 +144,40 @@ class SmartCube(RubiksCube):
                 case 5:
                     side_color: str = target_piece[0].name[1]
                     self.turn(Turn(self.color_order.index(side_color)*3), verbose=True)
+
+    def f2l(self: SmartCube):
+        self.rotate(Turn.Z2, verbose=True)
+        for side in self.f2l_order:
+            for _ in range(4):
+                try:
+                    edge: tuple = self.find_piece(0, self.f2l_sides[side][0])
+                    corner: tuple = self.find_piece(1, self.f2l_sides[side][1])
+                    #print(f"..{edge[0]}")
+                    edge_state: tuple = (self.f2l_relatives[0].index(edge[0]), edge[1].rotation)
+                    corner_state: tuple = (self.f2l_relatives[1].index(corner[0]), corner[1].rotation)
+                    print("e: ", *edge_state, " c: ", *corner_state)
+                    
+                    #major minor offset
+                    if not bool(self.f2l_sides[side][2]):
+                        print("changing due to offset")
+                        edge_state: tuple = (self.f2l_relatives[0].index(edge[0]), int(not bool(edge_state[1])))
+
+                    state: tuple[int] = (*edge_state, *corner_state)
+
+                    print("e: ", *edge_state, " c: ", *corner_state)
+            
+                    
+                    self.sequence(self.f2l_library[state], verbose=True)
+                    print("Solving")
+                    break
+                except KeyError:
+                    self.turn(Turn.U, verbose=True)
+
+            #rotate to next
+            self.sequence("y", verbose=True)
+            #change relatives
+            for relatives in self.f2l_relatives:
+                relatives[0], relatives[1], relatives[2], relatives[3], relatives[4], relatives[5], relatives[6], relatives[7] = relatives[3], relatives[0], relatives[1], relatives[2], relatives[5], relatives[6], relatives[7], relatives[4]
 
 
 
