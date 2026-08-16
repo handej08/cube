@@ -106,6 +106,27 @@ class SmartCube(RubiksCube):
             (7, 0, 0, 1): "y2 U' (R U' R') (L U' L') y2",
             (7, 1, 0, 2): "y2 U2 F' (L U L') F y2",
             (7, 1, 0, 1): "y2 U2' R (B' U' B) R' y2",
+            #2B
+            (1, 1, 6, 0): "y U (R U' R') (L' U L) y'",
+            (1, 0, 6, 0): "y2 (L' U2 L) U' (L U L') y2",
+            (1, 1, 6, 2): "y U2 (R U' R') U (L' U' L) y'",
+            (1, 0, 6, 2): "y2 U' L' U' L2 U2 L' y2",
+            (1, 1, 6, 1): "y2 F B' U F' B y2",
+            (1, 0, 6, 1): "y U' (R U R') (F U F') y'",
+
+            (2, 0, 4, 0): "U' (L' U L) (R U' R')",
+            (2, 1, 4, 0): "y' (R U2 R') U (R' U' R) y",
+            (2, 0, 4, 1): "y' (F R' F' R) U (R' U2 R) y",
+            (2, 1, 4, 1): "y' U R U R2' U2 R y",
+            (2, 0, 4, 2): "y' F' B U' F B' y",
+            (2, 1, 4, 2): "U (L' U' L) (F' U' F)",
+
+            (3, 0, 7, 0): "y2 U' (F' U F) (L U2 L') y2",
+            (0, 1, 7, 0): "y' U (F U' F') (R' U2 R) y",
+            (3, 0, 7, 2): "y2 (R U' R') (L U2 L') y2",
+            (0, 1, 7, 1): "y' (L' U L) (R' U2 R) y",
+            (3, 0, 7, 1): "y2 (R U' R') U (L U L') y2",
+            (0, 1, 7, 2): "y2 (R' F R F') (L U2 L') y2",
         }
 
     def find_piece(self: SmartCube, variety: int, piece: EP | CP) -> tuple:
