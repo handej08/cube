@@ -151,6 +151,39 @@ class SmartCube(RubiksCube):
             (5, 1, 6, 1): "(R' U' F R F') U2 (R U R')",
         }
 
+    def compact_sequence(self: SmartCube, sequence: str) -> str:
+        #compact duplicate moves
+        new_seq: list[str] = [" "]
+        for i, x in enumerate(sequence):
+            if not x.lower() in "udfblrxyz":
+                continue
+            turn: str = x
+            # replace 2 and ' with star counters
+            if i < len(sequence) - 1:
+                if sequence[i+1] == "2":
+                    turn += "*"
+                elif sequence[i+1] == "'":
+                    turn += "**"
+            if turn[0].lower() == new_seq[-1][0].lower():
+                # change previous and it's stars
+                new_seq[-1] = new_seq[-1][0] + "*" * ((len(turn) + len(new_seq[-1])-1) % 4)
+            else:
+                new_seq.append(turn)
+
+        #replace stars with 2 and '
+        new_seq_styled: list[str] = [f"{i} ".replace("***", "4").replace("**", "'").replace("*", "2") for i in new_seq[1:]]
+        new_seq_compact = ""
+        for i in new_seq_styled:
+            # remove full turns
+            if "4" not in i:
+                new_seq_compact += i
+        return new_seq_compact
+
+    def pop_turn_tape(self: SmartCube, *, compact: bool = True):
+        #compacted tape
+        return self.compact_sequence(super().pop_turn_tape()) if compact else super().pop_turn_tape()
+
+
     def scramble(self: SmartCube, verbose: bool = False) -> str:
         scramble_wca: str = scrambler333.get_WCA_scramble()
         self.sequence(scramble_wca, verbose=verbose)
