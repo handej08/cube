@@ -1,10 +1,12 @@
 
 from cube import RubiksCube, EP, CP, Turn
+from pyTwistyScrambler import scrambler333
 
 def main():
     cube: SmartCube = SmartCube()
-    cube.sequence("D' L R2 B2 L2 B2 R' U2 R U2 F2 U2 D F U' L' B F D' R'")
+    #cube.sequence("Z2 R U R' U' L' U' L U U2 F U' F' U F' U F")
     #cube.sequence("L' D L")
+    print(cube.scramble())
 
     cube.show()
     cube.cross()
@@ -147,6 +149,11 @@ class SmartCube(RubiksCube):
             (5, 1, 4, 2): "y (L U F' L' F) U2 (L' U' L) y'",
             (5, 1, 6, 1): "(R' U' F R F') U2 (R U R')",
         }
+
+    def scramble(self: SmartCube, verbose: bool = False) -> str:
+        scramble_wca: str = scrambler333.get_WCA_scramble()
+        self.sequence(scramble_wca, verbose=verbose)
+        return scramble_wca
 
     def find_piece(self: SmartCube, variety: int, piece: EP | CP) -> tuple:
         for i, p in enumerate(self.cube[variety]):
