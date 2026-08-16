@@ -39,7 +39,7 @@ class SmartCube(RubiksCube):
 
         self.f2l_library: dict[tuple] = {
             (5, 0, 5, 0): "",
-
+            #1A
             (3, 0, 2, 0): "y F R U2 R' F' y'",
             (0, 1, 2, 0): "F' L' U2 L F",
             (0, 0, 2, 0): "U (R U2 R') U (R U' R')",
@@ -66,7 +66,7 @@ class SmartCube(RubiksCube):
             (3, 1, 2, 2): "y U (L' U' L) U2 (L' U L) y'",
             (2, 0, 2, 1): "y (L' U L) y' U2 (R U R')",
             (1, 1, 2, 2): "(R U' R') y U2 (L' U' L) y'",
-
+            #1B
             (5, 0, 2, 2): "U (R U R') U2 (R U R')",
             (5, 0, 2, 1): "U' R U' R' U2 R U' R'",
             (5, 1, 2, 2): "U (F' U' F) U' (R U R')",
@@ -80,6 +80,32 @@ class SmartCube(RubiksCube):
             (2, 1, 5, 1): "y (L' U L) U' (L' U L) y'",
             (1, 0, 5, 0): "U' (R' F R F') (R U R')",
             (2, 1, 5, 0): "U (R U' R') (F R' F' R)",
+            #1C
+            (5, 0, 5, 1): "(R U' R') U (R U2 R' U R U' R')",
+            (5, 0, 5, 2): "(R U' R') U' (R U R' U2 R U' R')",
+            (5, 1, 5, 1): "(R U' R') (F' L' U2 L F)",
+            (5, 1, 5, 2): "(F' L' U2 L F) (R U R')",
+            (5, 1, 5, 0): "R2' U2' F R2 F' U2' R' U R'",
+            #2A
+            (6, 0, 2, 0): "U' R' U R2 U' R'",
+            (4, 0, 2, 0): "y U L U' L2' U L y'",
+            (6, 1, 2, 0): "y R' F R2 U' R' U2 F' y'",
+            (4, 1, 2, 0): "L F' L2' U L U2' F",
+            (7, 0, 0, 0): "y2 U2 L2 D F2 D' L2 y2",
+            (7, 1, 0, 0): "y2 L F' U F L' y2",
+
+            (6, 0, 2, 2): "R' U' R2 U R'",
+            (4, 0, 2, 1): "y L U L2' U' L y'",
+            (6, 1, 2, 2): "F D R D' F'",
+            (4, 1, 2, 1): "L' (F' U' F) L",
+            (4, 0, 2, 2): "U' (L' U' L) (R U' R')",
+            (6, 0, 2, 1): "U (R U R') (L' U L)",
+            (4, 1, 2, 2): "(F U2 F') (R U R')",
+            (6, 1, 2, 1): "R' U2 R F' U' F",
+            (7, 0, 0, 2): "y2 U (R U R') (L U L') y2",
+            (7, 0, 0, 1): "y2 U' (R U' R') (L U' L') y2",
+            (7, 1, 0, 2): "y2 U2 F' (L U L') F y2",
+            (7, 1, 0, 1): "y2 U2' R (B' U' B) R' y2",
         }
 
     def find_piece(self: SmartCube, variety: int, piece: EP | CP) -> tuple:
@@ -92,6 +118,7 @@ class SmartCube(RubiksCube):
         self.color_order[rotation_instructions[0]], self.color_order[rotation_instructions[1]], self.color_order[rotation_instructions[2]], self.color_order[rotation_instructions[3]] = self.color_order[rotation_instructions[3]], self.color_order[rotation_instructions[0]], self.color_order[rotation_instructions[1]], self.color_order[rotation_instructions[2]]
              
     def cross_score(self: SmartCube) -> tuple:
+        # creates scores for cross piece positions
         cross_pieces = [self.find_piece(0, EP.WB), self.find_piece(0, EP.WR), self.find_piece(0, EP.WG), self.find_piece(0, EP.WO)]
         scores = [-1 for _ in cross_pieces]
         for i, p in enumerate(cross_pieces):
