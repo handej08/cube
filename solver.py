@@ -66,6 +66,20 @@ class SmartCube(RubiksCube):
             (3, 1, 2, 2): "y U (L' U' L) U2 (L' U L) y'",
             (2, 0, 2, 1): "y (L' U L) y' U2 (R U R')",
             (1, 1, 2, 2): "(R U' R') y U2 (L' U' L) y'",
+
+            (5, 0, 2, 2): "U (R U R') U2 (R U R')",
+            (5, 0, 2, 1): "U' R U' R' U2 R U' R'",
+            (5, 1, 2, 2): "U (F' U' F) U' (R U R')",
+            (5, 1, 2, 1): "y U' (F U F') U (L' U' L) y'",
+            (5, 0, 2, 0): "(U R U' R') (U R U' R') (U R U' R')",
+            (5, 1, 2, 0): "(R U' R') (F' U2 F)",
+
+            (1, 0, 5, 1): "(R U R') U' (R U R')",
+            (2, 1, 5, 2): "y (L' U' L) U (L' U' L) y'",
+            (1, 0, 5, 2): "(R U' R') U (R U' R')",
+            (2, 1, 5, 1): "y (L' U L) U' (L' U L) y'",
+            (1, 0, 5, 0): "U' (R' F R F') (R U R')",
+            (2, 1, 5, 0): "U (R U' R') (F R' F' R)",
         }
 
     def find_piece(self: SmartCube, variety: int, piece: EP | CP) -> tuple:
