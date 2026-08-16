@@ -220,7 +220,7 @@ class SmartCube(RubiksCube):
         return cross_pieces, scores
         
 
-    def cross(self: SmartCube):
+    def cross(self: SmartCube, verbose: bool = False):
         while True:
             cross_pieces, scores = self.cross_score()
             if min(scores) == 10:
@@ -231,45 +231,47 @@ class SmartCube(RubiksCube):
                 case 1:
                     if max(scores) < 10:
                         while self.find_piece(0, target_piece[1].id)[0] != target_piece[1].id:
-                            self.turn(Turn.U, verbose=True)
+                            self.turn(Turn.U, verbose=verbose)
                     else:
-                        self.turn(Turn[f"{target_piece[0].name[1]}2"], verbose=True)
+                        self.turn(Turn(self.color_order.index(target_piece[0].name[1])*3+1), verbose=verbose)
                 case 2:
                     while self.find_piece(0, target_piece[1].id)[0].name[1] != target_piece[1].id.name[1]:
-                        self.turn(Turn.D, verbose=True)
-                    self.turn(Turn(self.color_order.index(target_piece[1].id.name[1])*3+1), verbose=True)
+                        self.turn(Turn.D, verbose=verbose)
+                    self.turn(Turn(self.color_order.index(target_piece[1].id.name[1])*3+1), verbose=verbose)
 
                 case 3:
                     side_color: str = target_piece[0].name[int(not bool(target_piece[1].rotation))]
                     piece_to_replace: EP = self.cube[0][target_piece[1].id.value].id
                     rotations = 0
                     while self.find_piece(0, piece_to_replace)[0].name[1] != side_color:
-                        self.turn(Turn.U, verbose=True)
+                        self.turn(Turn.U, verbose=verbose)
                         rotations = (rotations + 1) % 4
                     while self.find_piece(0, target_piece[1].id)[0].name[0] != "W":
-                        self.turn(Turn(self.color_order.index(side_color)*3), verbose=True)
+                        self.turn(Turn(self.color_order.index(side_color)*3), verbose=verbose)
                     for _ in range(rotations):
-                        self.turn(Turn.U_, verbose=True)
+                        self.turn(Turn.U_, verbose=verbose)
 
                 case 4:
                     
                     while self.find_piece(0, target_piece[1].id)[0].name[1] == target_piece[1].id.name[1] or self.find_piece(0, target_piece[1].id)[0].name[1] == self.color_opposites[target_piece[1].id.name[1]]:
-                        self.turn(Turn.D, verbose=True)
+                        self.turn(Turn.D, verbose=verbose)
                     side: Turn = Turn(self.color_order.index(self.find_piece(0, target_piece[1].id)[0].name[1])*3)
                     while target_piece[1].id.name[1] not in self.find_piece(0, target_piece[1].id)[0].name:
-                        self.turn(side, verbose=True)
+                        self.turn(side, verbose=verbose)
                     while self.find_piece(0, target_piece[1].id)[0] != target_piece[1].id:
-                        self.turn(Turn(self.color_order.index(target_piece[1].id.name[1])*3), verbose=True)
+                        self.turn(Turn(self.color_order.index(target_piece[1].id.name[1])*3), verbose=verbose)
 
 
 
                 case 5:
                     side_color: str = target_piece[0].name[1]
-                    self.turn(Turn(self.color_order.index(side_color)*3), verbose=True)
+                    self.turn(Turn(self.color_order.index(side_color)*3), verbose=verbose)
 
-    def f2l(self: SmartCube):
-        self.rotate(Turn.Z2, verbose=True)
-        for side in self.f2l_order:
+    def f2l(self: SmartCube, verbose: bool = False):
+        self.rotate(Turn.Z2, verbose=verbose)
+        #for each pair
+        for side in self.f2l_order * 4:
+            #turn upper
             for _ in range(4):
                 try:
                     edge: tuple = self.find_piece(0, self.f2l_sides[side][0])
@@ -277,26 +279,27 @@ class SmartCube(RubiksCube):
                     #print(f"..{edge[0]}")
                     edge_state: tuple = (self.f2l_relatives[0].index(edge[0]), edge[1].rotation)
                     corner_state: tuple = (self.f2l_relatives[1].index(corner[0]), corner[1].rotation)
-                    print("e: ", *edge_state, " c: ", *corner_state)
+                    #print("e: ", *edge_state, " c: ", *corner_state)
                     
                     #major minor offset
-                    if not bool(self.f2l_sides[side][2]):
-                        print("changing due to offset")
+                    # only for upper pieces if minor
+                    if edge_state[0] < 4 and not bool(self.f2l_sides[side][2]):
+                        #print("changing due to offset")
                         edge_state: tuple = (self.f2l_relatives[0].index(edge[0]), int(not bool(edge_state[1])))
 
                     state: tuple[int] = (*edge_state, *corner_state)
 
-                    print("e: ", *edge_state, " c: ", *corner_state)
+                    #print("e: ", *edge_state, " c: ", *corner_state)
             
                     
-                    self.sequence(self.f2l_library[state], verbose=True)
-                    print("Solving")
+                    self.sequence(self.f2l_library[state], verbose=verbose)
+                    #print("Solving")
                     break
                 except KeyError:
-                    self.turn(Turn.U, verbose=True)
+                    self.turn(Turn.U, verbose=verbose)
 
             #rotate to next
-            self.sequence("y", verbose=True)
+            self.sequence("y", verbose=verbose)
             #change relatives
             for relatives in self.f2l_relatives:
                 relatives[0], relatives[1], relatives[2], relatives[3], relatives[4], relatives[5], relatives[6], relatives[7] = relatives[3], relatives[0], relatives[1], relatives[2], relatives[5], relatives[6], relatives[7], relatives[4]
