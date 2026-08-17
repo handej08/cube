@@ -142,6 +142,12 @@ class SmartCube(RubiksCube):
             (5, 1, 6, 0): "y (L F' L' U F) (L' U L) y'",
             (5, 1, 4, 2): "y (L U F' L' F) U2 (L' U' L) y'",
             (5, 1, 6, 1): "(R' U' F R F') U2 (R U R')",
+            #not included
+            (4, 1, 4, 1): "L' U' L F' U2 F U F' U' F",
+            (4, 1, 4, 2): "L' U' L U F' U F U' F' U' F",
+            (8, 0, 8, 1): "L U L' R U' R U R U R'",
+            (8, 0, 8, 2): "L U' L' U R U' R' U2 R U' R'"
+
         }
 
         self.oll_library: dict[tuple] = {
