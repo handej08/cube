@@ -151,6 +151,42 @@ class SmartCube(RubiksCube):
             (5, 1, 6, 1): "(R' U' F R F') U2 (R U R')",
         }
 
+    
+    def count_turns(self: SmartCube, sequence: str) -> int:
+        ret: int = 0
+        for i in "udfbrl":
+            ret += sequence.lower().count(i)
+        return ret
+
+    def solve(self: SmartCube, *, verbose: bool = True, visual: bool = False, step_verbose: bool = False):
+
+        #track turns
+        turns: list[str] = []
+        self.pop_turn_tape()
+
+        self.cross()
+        turns.append(self.pop_turn_tape())
+        if step_verbose:
+            print(f"Cross ({self.count_turns(turns[-1])}): {turns[-1]}")
+        if visual:
+            self.show()
+
+        self.f2l()
+        turns.append(self.pop_turn_tape())
+        if step_verbose:
+            print(f"F2L ({self.count_turns(turns[-1])}): {turns[-1]}")
+        if visual:
+            self.show()
+
+        solution: str = ""
+        for i in turns:
+            solution += i
+
+        compact_solution: str = self.compact_sequence(solution)
+
+        if verbose:
+            print(f"Solution ({self.count_turns(compact_solution)}): {compact_solution}")
+
     def compact_sequence(self: SmartCube, sequence: str) -> str:
         #compact duplicate moves
         new_seq: list[str] = [" "]
