@@ -244,31 +244,37 @@ class SmartCube(RubiksCube):
 
     def compact_sequence(self: SmartCube, sequence: str) -> str:
         #compact duplicate moves
-        new_seq: list[str] = [" "]
-        for i, x in enumerate(sequence):
-            if not x.lower() in "udfblrxyz":
-                continue
-            turn: str = x
-            # replace 2 and ' with star counters
-            if i < len(sequence) - 1:
-                if sequence[i+1] == "2":
-                    turn += "*"
-                elif sequence[i+1] == "'":
-                    turn += "**"
-            if turn[0].lower() == new_seq[-1][0].lower():
-                # change previous and it's stars
-                new_seq[-1] = new_seq[-1][0] + "*" * ((len(turn) + len(new_seq[-1])-1) % 4)
+        #keep track of changes
+        prev_seq = sequence
+        while True:
+            new_seq: list[str] = [" "]
+            for i, x in enumerate(prev_seq):
+                if not x.lower() in "udfblrxyz":
+                    continue
+                turn: str = x
+                # replace 2 and ' with star counters
+                if i < len(prev_seq) - 1:
+                    if prev_seq[i+1] == "2":
+                        turn += "*"
+                    elif prev_seq[i+1] == "'":
+                        turn += "**"
+                if turn[0].lower() == new_seq[-1][0].lower():
+                    # change previous and it's stars
+                    new_seq[-1] = new_seq[-1][0] + "*" * ((len(turn) + len(new_seq[-1])-1) % 4)
+                else:
+                    new_seq.append(turn)
+            #replace stars with 2 and '
+            new_seq_styled: list[str] = [f"{i} ".replace("***", "4").replace("**", "'").replace("*", "2") for i in new_seq[1:]]
+            new_seq_compact = ""
+            for i in new_seq_styled:
+                # remove full turns
+                if "4" not in i:
+                    new_seq_compact += i
+            # return if nothing changed
+            if new_seq_compact == prev_seq:
+                return new_seq_compact
             else:
-                new_seq.append(turn)
-
-        #replace stars with 2 and '
-        new_seq_styled: list[str] = [f"{i} ".replace("***", "4").replace("**", "'").replace("*", "2") for i in new_seq[1:]]
-        new_seq_compact = ""
-        for i in new_seq_styled:
-            # remove full turns
-            if "4" not in i:
-                new_seq_compact += i
-        return new_seq_compact
+                prev_seq = new_seq_compact
 
     def pop_turn_tape(self: SmartCube, *, compact: bool = True):
         #compacted tape
