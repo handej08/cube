@@ -257,19 +257,30 @@ class SmartCube(RubiksCube):
         
 
     def cross(self: SmartCube, verbose: bool = False):
+        #uses second best if true
+        skip_first: bool = False
         while True:
             cross_pieces, scores = self.cross_score()
             if min(scores) == 10:
                 break
+            #pretend best is solved, prevents loops
+            if skip_first:
+                scores[min(range(len(scores)), key=scores.__getitem__)] = 10
             target = min(range(len(scores)), key=scores.__getitem__)
             target_piece = cross_pieces[target]
+            skip_first = False
             match scores[target]:
                 case 1:
                     if max(scores) < 10:
                         while self.find_piece(0, target_piece[1].id)[0] != target_piece[1].id:
                             self.turn(Turn.U, verbose=verbose)
                     else:
-                        self.turn(Turn(self.color_order.index(target_piece[0].name[1])*3+1), verbose=verbose)
+                        # if it will cause loop: use second best instead
+                        opposite_piece: Edge = self.get_piece(0, EP[(target_piece[0].name.replace("W", "Y"))])
+                        if opposite_piece.rotation == 0 and "W" in opposite_piece.id.name:
+                            skip_first = True
+                        else:
+                            self.turn(Turn(self.color_order.index(target_piece[0].name[1])*3+1), verbose=verbose)
                 case 2:
                     while self.find_piece(0, target_piece[1].id)[0].name[1] != target_piece[1].id.name[1]:
                         self.turn(Turn.D, verbose=verbose)
