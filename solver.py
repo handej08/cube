@@ -31,13 +31,6 @@ class SmartCube(RubiksCube):
             "R": (EP.GR, CP.WGR, 0)
         }
 
-        """self.f2l_relatives: dict[tuple[list[EP | CP]]] = {
-            "G": ([EP.YB, EP.YO, EP.YG, EP.YR, EP.GR, EP.GO, EP.BO, EP.BR], [CP.YBR, CP.YBO, CP.YGO, CP.YGR, CP.WGR, CP.WGO, CP.WBO, CP.WBR]),
-            "O": ([EP.YR, EP.YB, EP.YO, EP.YG, EP.GR, EP.GO, EP.BO, EP.BR])
-            "B": [],
-            "R": []
-        }"""
-
         self.f2l_relatives : list[list[EP | CP]] = [[EP.YB, EP.YO, EP.YG, EP.YR, EP.GR, EP.GO, EP.BO, EP.BR], [CP.YBR, CP.YBO, CP.YGO, CP.YGR, CP.WGR, CP.WGO, CP.WBO, CP.WBR]]
 
         self.f2l_library: dict[tuple] = {
@@ -151,6 +144,68 @@ class SmartCube(RubiksCube):
             (5, 1, 6, 1): "(R' U' F R F') U2 (R U R')",
         }
 
+        self.oll_library: dict[tuple] = {
+            (2, 1, 1, 1, 2, 1, 1, 1): "R U2 R2 F R F' U2 R' F R F'",
+            (1, 1, 2, 1, 2, 1, 1, 1): "r U r' U2 r U2 R' U2 R U' r'",
+            (1, 1, 1, 1, 1, 1, 0, 1): "r' R2 U R' U r U2 r' U M'",
+            (2, 1, 2, 1, 0, 1, 2, 1): "M U' r U2 r' U' R U' R' M'",
+            (0, 0, 1, 1, 1, 1, 1, 0): "l' U2 L U L' U l",
+            (2, 0, 0, 0, 2, 1, 2, 1): "r U2 R' U' R U' r'",
+            (1, 0, 1, 1, 1, 1, 0, 0): "r U R' U R U2 r'",
+            (2, 0, 2, 0, 0, 1, 2, 1): "l' U' L U' L' U2 l",
+            (2, 0, 2, 1, 0, 1, 2, 0): "R U R' U' R' F R2 U R' U' F'",
+            (1, 1, 0, 1, 1, 0, 1, 0): "R U R' U R' F R F' R U2 R'",
+            (1, 0, 0, 1, 1, 1, 1, 0): "r U R' U R' F R F' R U2 r'",
+            (0, 0, 2, 0, 2, 1, 2, 1): "M' R' U' R U' R' U2 R U' R r'",
+            (1, 1, 1, 0, 1, 1, 0, 0): "F U R U' R2 F' R U R U' R'",
+            (2, 1, 2, 0, 0, 1, 2, 0): "R' F R U R' F' R F U' F'",
+            (0, 1, 1, 0, 1, 1, 1, 0): "l' U' l L' U' L U l' U l",
+            (2, 1, 0, 0, 2, 1, 2, 0): "r U r' R U R' U' r U' r'",
+            (0, 1, 1, 1, 0, 1, 2, 1): "F R' F' R2 r' U R U' R' U' M'",
+            (0, 1, 0, 1, 1, 1, 2, 1): "r U R' U R U2 r2 U' R U' R' U2 r",
+            (0, 1, 0, 1, 2, 1, 1, 1): "r' R U R U R' U' M' R' F R F'",
+            (0, 1, 0, 1, 0, 1, 0, 1): "r U R' U' M2 U R U' R' U' M'",
+            (1, 0, 2, 0, 1, 0, 2, 0): "R U2 R' U' R U R' U' R U' R'",
+            (2, 0, 2, 0, 1, 0, 1, 0): "R U2 R2 U' R2 U' R2 U2 R",
+            (1, 0, 2, 0, 0, 0, 0, 0): "R2 D' R U2 R' D R U2 R",
+            (1, 0, 0, 0, 0, 0, 2, 0): "r U R' U' r' F R F'",
+            (2, 0, 0, 0, 1, 0, 0, 0): "F' r U R' U' r' F R",
+            (2, 0, 0, 0, 2, 0, 2, 0): "R U2 R' U' R U' R'",
+            (1, 0, 1, 0, 1, 0, 0, 0): "R U R' U R U2 R'",
+            (0, 0, 0, 1, 0, 1, 0, 0): "r U R' U' r' R U R U' R'",
+            (1, 0, 0, 1, 0, 1, 2, 0): "R U R' U' R U' R' F' U' F R U R'",
+            (2, 0, 1, 1, 0, 1, 0, 0): "F R' F R2 U' R' U' R U R' F2",
+            (1, 0, 0, 0, 0, 1, 2, 1): "R' U' F U R U' R' F' R",
+            (0, 0, 2, 1, 1, 1, 0, 0): "L U F' U' L' U L F L'",
+            (1, 1, 0, 0, 0, 1, 2, 0): "R U R' U' R' F R F'",
+            (2, 1, 1, 0, 0, 1, 0, 0): "R U R2 U' R' F R U R U' F'",
+            (0, 1, 1, 0, 0, 0, 2, 1): "R U2 R2 F R F' R U2 R'",
+            (0, 0, 2, 0, 0, 1, 1, 1): "L' U' L U' L' U L U L F' L' F",
+            (0, 0, 1, 1, 0, 1, 2, 0): "F R' F' R U R U' R'",
+            (1, 0, 0, 1, 2, 1, 0, 0): "R U R' U R U' R' U' R' F R F'",
+            (1, 1, 0, 0, 2, 1, 0, 0): "L F' L' U' L U F U' L'",
+            (0, 1, 2, 0, 0, 1, 1, 0): "R' F R U R' U' F' U R",
+            (1, 0, 2, 1, 0, 1, 0, 0): "R U R' U R U2 R' F R U R' U' F'",
+            (0, 1, 0, 1, 1, 0, 2, 0): "R' U' R U' R' U2 R F R U R' U' F'",
+            (2, 0, 0, 0, 0, 1, 1, 1): "F' U' L' U L F",
+            (0, 0, 1, 1, 2, 1, 0, 0): "F U R U' R' F'",
+            (2, 1, 0, 0, 0, 1, 1, 0): "F R U R' U' F'",
+            (0, 0, 1, 1, 2, 0, 0, 1): "R' U' R' F R F' U R",
+            (1, 0, 1, 0, 2, 1, 2, 1): "R' U' R' F R F' R' F R F' U R",
+            (2, 0, 2, 1, 1, 1, 1, 0): "F R U R' U' R U R' U' F'",
+            (2, 0, 2, 0, 1, 1, 1, 1): "r U' r2 U r2 U r2 U' r",
+            (2, 1, 2, 0, 1, 0, 1, 1): "r' U r2 U' r2 U' r2 U r'",
+            (1, 1, 1, 0, 2, 1, 2, 0): "F U R U' R' U R U' R' F'",
+            (1, 0, 1, 1, 2, 0, 2, 1): "R U R' U R U' B U' B' R'",
+            (1, 0, 2, 0, 1, 1, 2, 1): "l' U2 L U L' U' L U L' U l",
+            (1, 0, 2, 1, 1, 1, 2, 0): "r U2 R' U' R U R' U' R U' r'",
+            (1, 0, 2, 0, 1, 1, 2, 0): "R' F R U R U' R2 F' R2 U' R' U R U R'",
+            (2, 1, 1, 0, 2, 1, 1, 0): "r' U' r U' R' U R U' R' U R r' U r",
+            (0, 1, 0, 0, 0, 1, 0, 0): "R U R' U' M' U R U' r'",
+
+        }
+
+        self.oll_relatives: list[EP | CP] = [CP.YBR, EP.YB, CP.YBO, EP.YO, CP.YGO, EP.YG, CP.YGR, EP.YR]
     
     def count_turns(self: SmartCube, sequence: str) -> int:
         ret: int = 0
@@ -351,6 +406,24 @@ class SmartCube(RubiksCube):
             for relatives in self.f2l_relatives:
                 relatives[0], relatives[1], relatives[2], relatives[3], relatives[4], relatives[5], relatives[6], relatives[7] = relatives[3], relatives[0], relatives[1], relatives[2], relatives[5], relatives[6], relatives[7], relatives[4]
 
+    def oll(self: SmartCube, verbose: bool = False):
+        # find case
+        oll_case: list[int] = []
+        for i, rel_piece in enumerate(self.oll_relatives):
+            piece: Edge | Corner = self.get_piece(int(not(bool(i % 2))), rel_piece)
+            oll_case.append(piece.rotation)
+        for i in range(4):
+            try:
+                solution: str = self.oll_library[tuple(oll_case)]
+                #solve
+                self.sequence("y'" * i + solution + "y" * i, verbose=verbose)
+
+                break
+            except KeyError:
+                #turn and check from other view
+                for _ in range(2):
+                    front: int = oll_case.pop(0)
+                    oll_case.append(front)
 
 
 if __name__ == "__main__":
