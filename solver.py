@@ -233,6 +233,13 @@ class SmartCube(RubiksCube):
         if visual:
             self.show()
 
+        self.oll()
+        turns.append(self.pop_turn_tape())
+        if step_verbose:
+            print(f"OLL ({self.count_turns(turns[-1])}): {turns[-1]}")
+        if visual:
+            self.show()
+
         solution: str = ""
         for i in turns:
             solution += i
