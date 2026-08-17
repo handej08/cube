@@ -79,6 +79,46 @@ class RubiksCube:
             [0, 4, 1, 5]  #Z
         ]
 
+
+        #equivalents of slice and wide moves
+        self.slice_alternatives: list[tuple[str]] = [
+            ("S'", "x M' x'"),
+            ("S2", "x M2 x'"),
+            ("S", "x M x'"),
+
+            ("E'", "z M' z'"),
+            ("E2", "z M2 z'"),
+            ("E", "z M z'"),
+
+            ("M'", "R' L x"),
+            ("M2", "R2 L2 x2"),
+            ("M", "R L' x'"),
+
+            ("u'", "D' y'"),
+            ("u2", "D2 y2"),
+            ("u", "D y"),
+
+            ("d'", "U' y"),
+            ("d2", "U2 y2"),
+            ("d", "U y'"),
+
+            ("f'", "B' z'"),
+            ("f2", "B2 z2"),
+            ("f", "B z"),
+
+            ("b'", "F' z"),
+            ("b2", "F2 z2"),
+            ("b", "F z'"),
+
+            ("r'", "L' x'"),
+            ("r2", "L2 x2"),
+            ("r", "L x"),
+            
+            ("l'", "R' x"),
+            ("l2", "R2 x2"),
+            ("l", "R x'"),
+        ]
+
     def show(self: RubiksCube):
         value = ""
         for row in self.display:
@@ -113,7 +153,7 @@ class RubiksCube:
         found_piece: Piece = self.cube[variety][piece.value]
         return found_piece.stickers[(found_piece.rotation + offset) % found_piece.size]
     
-    def get_piece(self: RubiksCube, variety: int, piece: int):
+    def get_piece(self: RubiksCube, variety: int, piece: EP | CP):
         return self.cube[variety][piece.value]
 
     def cycle(self: RubiksCube, variety: int, *stickers: tuple):
@@ -150,6 +190,11 @@ class RubiksCube:
         self.turn_library[rotation_instructions[0]], self.turn_library[rotation_instructions[1]], self.turn_library[rotation_instructions[2]], self.turn_library[rotation_instructions[3]] = self.turn_library[rotation_instructions[3]], self.turn_library[rotation_instructions[0]], self.turn_library[rotation_instructions[1]], self.turn_library[rotation_instructions[2]]
 
     def sequence(self: RubiksCube, seq: str, verbose = False):
+
+        #swap slice moves
+        for alternative in self.slice_alternatives:
+            seq = seq.replace(*alternative)
+
         for i, x in enumerate(seq):
             is_last: bool = (i == len(seq) - 1)
             move = "udfbrlxyz".find(x.lower())*3
@@ -231,6 +276,7 @@ class Piece:
     def __init__(self, id: EP | CP, *stickers: list, rotation = 0):
         # clockwise, main is sticker on w/y, else g/b
         self.stickers: list[C] = stickers
+        # for corners: amount of turns clockwise before major sticker is in position, or what sticker (clockwise from major) is in major position.
         self.rotation: int = rotation
         self.id: EP | CP = id
 
