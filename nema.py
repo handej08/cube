@@ -23,7 +23,7 @@ class Stepper:
     def turn(self, amount):
         #turn on
         self.en.value(0)
-        self.dir.value(int(amount > 0))
+        self.dir.value(int(amount < 0))
         for _ in range(abs(amount)*self.steps_per_rev/4):
             self.step.value(1)
             utime.sleep(self.delay)
