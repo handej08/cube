@@ -212,6 +212,15 @@ class SmartCube(RubiksCube):
         }
 
         self.oll_relatives: list[EP | CP] = [CP.YBR, EP.YB, CP.YBO, EP.YO, CP.YGO, EP.YG, CP.YGR, EP.YR]
+
+        self.pll_library: dict[str] = {
+            # the color of each stricker on left and front, the color is first come first serve
+            "010221" : "R U R' U' R' F R2 U' R' U' R U R' F'", #T
+        }
+
+        self.pll_relatives: list[EP | CP] = [CP.YBR, EP.YR, CP.YGR, CP.YGR, EP.YG, CP.YGO, CP.YGO, EP.YO, CP.YBO, CP.YBO, EP.YB, CP.YBR]
+
+        self.pll_relatives_stickers: list[int] = [1, 1, 2, 1, 1, 2]
     
     def count_turns(self: SmartCube, sequence: str) -> int:
         ret: int = 0
@@ -243,6 +252,13 @@ class SmartCube(RubiksCube):
         turns.append(self.pop_turn_tape())
         if step_verbose:
             print(f"OLL ({self.count_turns(turns[-1])}): {turns[-1]}")
+        if visual:
+            self.show()
+
+        self.pll()
+        turns.append(self.pop_turn_tape())
+        if step_verbose:
+            print(f"PLL ({self.count_turns(turns[-1])}): {turns[-1]}")
         if visual:
             self.show()
 
@@ -437,13 +453,51 @@ class SmartCube(RubiksCube):
                 #solve
                 self.sequence("y'" * i + solution + "y" * i, verbose=verbose)
 
-                break
+                return
             except KeyError:
                 #turn and check from other view
+                #account for rotation by shuffling 
                 for _ in range(2):
                     front: int = oll_case.pop(0)
                     oll_case.append(front)
+        raise Exception("ERROR: OLL not found")
 
+    def pll(self: SmartCube, verbose: bool = False):
+        
+        for i in range(4):
+            pll_case: str = ""
+            found_colors: list[C] = []
+            for j, rel_piece in enumerate(self.pll_relatives[:6]):
+                
+                piece: Edge | Corner = self.get_piece(int(len(rel_piece.name) > 2), rel_piece)
+                #print(f"f{rel_piece.name}={piece.id}")
+                
+                sticker: C = piece.stickers[self.pll_relatives_stickers[j]]
+                if sticker in found_colors:
+                    pll_case += str(found_colors.index(sticker))
+                else: 
+                    pll_case += str(len(found_colors))
+                    found_colors.append(sticker)
+            try:
+                
+                solution: str = self.pll_library[pll_case]
+                #print(pll_case, solution)
+                self.sequence("y" * i + solution + "y'" * i, verbose=verbose)
+                #does auf
+                self.auf()
+                return
+            except KeyError:
+                #turn and check from other view
+                #account for rotation by shuffling 
+                front_3: list[EP | CP] = self.pll_relatives[:3]
+                self.pll_relatives = self.pll_relatives[3:] + front_3
+        raise Exception("ERROR: PLL not found")
+
+    def auf(self: SmartCube, verbose: bool = False):
+        while (self.get_piece(0, EP.YG).id != EP.YG):
+            self.sequence("U", verbose=verbose)
+        #rotate to standard
+        self.sequence("z2")
 
 if __name__ == "__main__":
     main()
