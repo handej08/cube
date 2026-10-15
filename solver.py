@@ -214,13 +214,35 @@ class SmartCube(RubiksCube):
         self.oll_relatives: list[EP | CP] = [CP.YBR, EP.YB, CP.YBO, EP.YO, CP.YGO, EP.YG, CP.YGR, EP.YR]
 
         self.pll_library: dict[str] = {
+            #based on https://www.speedsolving.com/wiki/index.php/PLL
             # the color of each stricker on left and front, the color is first come first serve
-            "010221" : "R U R' U' R' F R2 U' R' U' R U R' F'", #T
+            "0101223" : "x L2 D2 L' U' L D2 L' U L' x'", #Aa
+            "0102031" : "x' L2 D2 L U L' D2 L U' L x", #Ab
+            "0001232" : "R2 B2 R2 L U' L F2 R' D L' F2 R L'", #F
+            "0102331" : "F B U2 F' B' L' U R' U2 L U' R", #Ga
+            "0102313" : "y R2 F2 U R2 D' R2 D B2 U' F2 B2 R2 y'", #Gb
+            "0101232" : "y' B2 R2 L2 U' R2 U R2 D' R2 D L2 B2 y", #Gc
+            "0102013" : "y2 L U L' B2 D' R U' R' U R' D B2 y2", #Gd
+            "0001123" : "y2 L2 D L D' L B2 R' U R B2 y2", #Ja
+            "0001223" : "R2 D' R' D R' B2 L U' L' B2", #Jb
+            "0102231" : "y2 F U2 F' U R B' R' F R B R' U F' y2", #Ra
+            "0101023" : "R2 F R U R U' R' F' R U2 R' U2 R", #Rb
+            "0102213" : "y F2 U' F2 D R2 B2 U B2 D' R2 y'", #T
+            "0121032" : "y F R B R' F' R L F L' B' L F' R' L' y'", #E
+            "0112331" : "R' U R2 B2 U R' B2 R U' B2 R2 U' R", #Na
+            "0012231" : "L U' L2' B2' U' L B2' L' U B2' L2' U L'", #Nb
+            "0112231" : "R' U R' U' B' D B' D' B2 R' B' R B R", #V
+            "0123312" : "R2 U' R2 U' R2 U F U F' R2 F U' F'", #Y
+            "0102321" : "R2 F2 B2 L2 D' R2 F2 B2 L2", #H
+            "0101213" : "y B2 U' R L' B2 R' L U' B2 y'", #Ua
+            "0102023" : "y B2' U L' R B2' L R' U B2' y'", #Ub
+            "0101012" : "y' R L' U2 D2 R L' D' R2 L2 U F2 B2 y", #Z
+            
         }
 
         self.pll_relatives: list[EP | CP] = [CP.YBR, EP.YR, CP.YGR, CP.YGR, EP.YG, CP.YGO, CP.YGO, EP.YO, CP.YBO, CP.YBO, EP.YB, CP.YBR]
 
-        self.pll_relatives_stickers: list[int] = [1, 1, 2, 1, 1, 2]
+        self.pll_relatives_stickers: list[int] = [1, 1, 2, 1, 1, 2, 1]
     
     def count_turns(self: SmartCube, sequence: str) -> int:
         ret: int = 0
@@ -470,10 +492,8 @@ class SmartCube(RubiksCube):
         for i in range(4):
             pll_case: str = ""
             found_colors: list[C] = []
-            for j, rel_piece in enumerate(self.pll_relatives[:6]):
-                
+            for j, rel_piece in enumerate(self.pll_relatives[:len(self.pll_relatives_stickers)]):
                 piece: Edge | Corner = self.get_piece(int(len(rel_piece.name) > 2), rel_piece)
-                #print(f"f{rel_piece.name}={piece.id}")
                 
                 sticker: C = piece.stickers[self.pll_relatives_stickers[j]]
                 if sticker in found_colors:
@@ -482,7 +502,6 @@ class SmartCube(RubiksCube):
                     pll_case += str(len(found_colors))
                     found_colors.append(sticker)
             try:
-                
                 solution: str = self.pll_library[pll_case]
                 #print(pll_case, solution)
                 self.sequence("y" * i + solution + "y'" * i, verbose=verbose)
