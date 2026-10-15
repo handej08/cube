@@ -1,5 +1,5 @@
-
-from cube import RubiksCube, EP, CP, Turn
+import copy
+from cube import RubiksCube, EP, CP, Turn, Corner, Edge, C
 from pyTwistyScrambler import scrambler333
 
 def main():
@@ -205,7 +205,7 @@ class SmartCube(RubiksCube):
             (1, 0, 1, 1, 2, 0, 2, 1): "R U R' U R U' B U' B' R'",
             (1, 0, 2, 0, 1, 1, 2, 1): "l' U2 L U L' U' L U L' U l",
             (1, 0, 2, 1, 1, 1, 2, 0): "r U2 R' U' R U R' U' R U' r'",
-            (1, 0, 2, 0, 1, 1, 2, 0): "R' F R U R U' R2 F' R2 U' R' U R U R'",
+            (1, 1, 2, 0, 1, 1, 2, 0): "R' F R U R U' R2 F' R2 U' R' U R U R'",
             (2, 1, 1, 0, 2, 1, 1, 0): "r' U' r U' R' U R U' R' U R r' U r",
             (0, 1, 0, 0, 0, 1, 0, 0): "R U R' U' M' U R U' r'",
 
@@ -267,6 +267,9 @@ class SmartCube(RubiksCube):
             solution += i
 
         compact_solution: str = self.compact_sequence(solution)
+
+        if not self.is_solved():
+            raise Exception("Could not solve cube")
 
         if verbose:
             print(f"Solution ({self.count_turns(compact_solution)}): {compact_solution}")
@@ -498,6 +501,13 @@ class SmartCube(RubiksCube):
             self.sequence("U", verbose=verbose)
         #rotate to standard
         self.sequence("z2")
+
+    def is_solved(self: SmartCube):
+        for piece in self.cube[0] + self.cube[1]:
+            if self.get_piece(int(len(piece.stickers) == 3), piece.id) != piece:
+                print(piece.id, self.get_piece(int(len(piece.stickers) == 3), piece.id).id)
+                return False
+        return True
 
 if __name__ == "__main__":
     main()
