@@ -146,7 +146,9 @@ class SmartCube(RubiksCube):
             (4, 1, 4, 1): "L' U' L F' U2 F U F' U' F",
             (4, 1, 4, 2): "L' U' L U F' U F U' F' U' F",
             (8, 0, 8, 1): "L U L' R U' R U R U R'",
-            (8, 0, 8, 2): "L U' L' U R U' R' U2 R U' R'"
+            (8, 0, 8, 2): "L U' L' U R U' R' U2 R U' R'",
+            (5, 0, 7, 1): "L U L' R U2 R' U R U R'",
+            (6, 1, 5, 2): "R U' R2 U2 R F' U' F",
 
         }
 
@@ -228,7 +230,7 @@ class SmartCube(RubiksCube):
             "0102231" : "y2 F U2 F' U R B' R' F R B R' U F' y2", #Ra
             "0101023" : "R2 F R U R U' R' F' R U2 R' U2 R", #Rb
             "0102213" : "y F2 U' F2 D R2 B2 U B2 D' R2 y'", #T
-            "0121032" : "y F R B R' F' R L F L' B' L F' R' L' y'", #E
+            "0121032" : "F R B R' F' R L F L' B' L F' R' L'", #E
             "0112331" : "R' U R2 B2 U R' B2 R U' B2 R2 U' R", #Na
             "0012231" : "L U' L2' B2' U' L B2' L' U B2' L2' U L'", #Nb
             "0112231" : "R' U R' U' B' D B' D' B2 R' B' R B R", #V
@@ -237,6 +239,8 @@ class SmartCube(RubiksCube):
             "0101213" : "y B2 U' R L' B2 R' L U' B2 y'", #Ua
             "0102023" : "y B2' U L' R B2' L R' U B2' y'", #Ub
             "0101012" : "y' R L' U2 D2 R L' D' R2 L2 U F2 B2 y", #Z
+
+            "0001112" : "" #PLL skip
             
         }
 
@@ -295,6 +299,8 @@ class SmartCube(RubiksCube):
 
         if verbose:
             print(f"Solution ({self.count_turns(compact_solution)}): {compact_solution}")
+
+        return self.is_solved()
 
     def compact_sequence(self: SmartCube, sequence: str) -> str:
         #compact duplicate moves
@@ -485,7 +491,6 @@ class SmartCube(RubiksCube):
                 for _ in range(2):
                     front: int = oll_case.pop(0)
                     oll_case.append(front)
-        raise Exception("ERROR: OLL not found")
 
     def pll(self: SmartCube, verbose: bool = False):
         
@@ -503,7 +508,6 @@ class SmartCube(RubiksCube):
                     found_colors.append(sticker)
             try:
                 solution: str = self.pll_library[pll_case]
-                #print(pll_case, solution)
                 self.sequence("y" * i + solution + "y'" * i, verbose=verbose)
                 #does auf
                 self.auf()
@@ -513,7 +517,6 @@ class SmartCube(RubiksCube):
                 #account for rotation by shuffling 
                 front_3: list[EP | CP] = self.pll_relatives[:3]
                 self.pll_relatives = self.pll_relatives[3:] + front_3
-        raise Exception("ERROR: PLL not found")
 
     def auf(self: SmartCube, verbose: bool = False):
         while (self.get_piece(0, EP.YG).id != EP.YG):
@@ -524,7 +527,6 @@ class SmartCube(RubiksCube):
     def is_solved(self: SmartCube):
         for piece in self.cube[0] + self.cube[1]:
             if self.get_piece(int(len(piece.stickers) == 3), piece.id) != piece:
-                print(piece.id, self.get_piece(int(len(piece.stickers) == 3), piece.id).id)
                 return False
         return True
 
