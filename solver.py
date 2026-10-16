@@ -346,6 +346,14 @@ class SmartCube(RubiksCube):
         self.sequence(scramble_wca, verbose=verbose)
         return scramble_wca
 
+    def fast_scramble(self: SmartCube,*, length: int = 30, verbose: bool = False) -> str:
+
+        #makes scramble using random moves
+        scramble_fast: str = " ".join([random.choice(list(Turn)[:17]).name for _ in range(length)]).replace("_", "'")
+        scramble_compact = self.compact_sequence(scramble_fast)
+        self.sequence(scramble_compact, verbose=verbose)
+        return scramble_compact
+
     def find_piece(self: SmartCube, variety: int, piece: EP | CP) -> tuple:
         for i, p in enumerate(self.cube[variety]):
             if p.id == piece:
