@@ -443,7 +443,8 @@ class SmartCube(RubiksCube):
                     side_color: str = target_piece[0].name[1]
                     self.turn(Turn(self.color_order.index(side_color)*3), verbose=verbose)
 
-    def f2l(self: SmartCube, verbose: bool = False):
+    def f2l(self: SmartCube, verbose: bool = False, *, pairs_solved: int = 0):
+
         self.rotate(Turn.Z2, verbose=verbose)
         #for each pair
         for side in self.f2l_order * 4:
