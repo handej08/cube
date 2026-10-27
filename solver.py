@@ -469,7 +469,9 @@ class SmartCube(RubiksCube):
             
                     
                     self.sequence(self.f2l_library[state], verbose=verbose)
-                    #print("Solving")
+                    #if is solving actual pair
+                    if state != (5, 0, 5, 0):
+                        pairs_solved += 1
                     break
                 except KeyError:
                     self.turn(Turn.U, verbose=verbose)
@@ -479,6 +481,15 @@ class SmartCube(RubiksCube):
             #change relatives
             for relatives in self.f2l_relatives:
                 relatives[0], relatives[1], relatives[2], relatives[3], relatives[4], relatives[5], relatives[6], relatives[7] = relatives[3], relatives[0], relatives[1], relatives[2], relatives[5], relatives[6], relatives[7], relatives[4]
+        if pairs_solved < 4 :
+            #check relatives to find unsolved
+            for i in range (0, 4):
+                rel_edge = self.get_piece(0, self.f2l_relatives[0][i+4])
+                rel_corner = self.get_piece(1, self.f2l_relatives[1][i+4])
+                if not (rel_edge == self.f2l_relatives[0][i+4] and rel_corner == self.f2l_relatives[1][i+4]):
+                    self.sequence("y "*i + "L' U' L" + "y' "*i + " Z2")
+                    self.f2l(verbose=verbose, pairs_solved=pairs_solved)
+                    return
 
     def oll(self: SmartCube, verbose: bool = False):
         # find case
