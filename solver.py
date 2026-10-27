@@ -1,6 +1,7 @@
 import copy
 from cube import RubiksCube, EP, CP, Turn, Corner, Edge, C
 from pyTwistyScrambler import scrambler333
+import random
 
 def main():
     cube: SmartCube = SmartCube()
@@ -495,15 +496,11 @@ class SmartCube(RubiksCube):
                 try:
                     edge: tuple = self.find_piece(0, self.f2l_sides[side][0])
                     corner: tuple = self.find_piece(1, self.f2l_sides[side][1])
-                    #print(f"..{edge[0]}")
                     edge_state: tuple = (self.f2l_relatives[0].index(edge[0]), edge[1].rotation)
                     corner_state: tuple = (self.f2l_relatives[1].index(corner[0]), corner[1].rotation)
-                    #print("e: ", *edge_state, " c: ", *corner_state)
-                    
                     #major minor offset
                     # only for upper pieces if minor
                     if edge_state[0] < 4 and not bool(self.f2l_sides[side][2]):
-                        #print("changing due to offset")
                         edge_state: tuple = (self.f2l_relatives[0].index(edge[0]), int(not bool(edge_state[1])))
 
                     state: tuple[int] = (*edge_state, *corner_state)
