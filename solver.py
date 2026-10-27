@@ -342,7 +342,7 @@ class SmartCube(RubiksCube):
         if verbose:
             print(f"Solution ({self.count_turns(compact_solution)}): {compact_solution}")
 
-        return self.is_solved()
+        return self.is_solved(), self.count_turns(compact_solution)
 
     def compact_sequence(self: SmartCube, sequence: str) -> str:
         #compact duplicate moves
@@ -507,11 +507,7 @@ class SmartCube(RubiksCube):
                         edge_state: tuple = (self.f2l_relatives[0].index(edge[0]), int(not bool(edge_state[1])))
 
                     state: tuple[int] = (*edge_state, *corner_state)
-
-                    #print("e: ", *edge_state, " c: ", *corner_state)
-            
-                    
-                    self.sequence(self.f2l_library[state], verbose=verbose)
+                    self.sequence(self.f2l_library[state], verbose=verbose)             
                     #if is solving actual pair
                     if state != (5, 0, 5, 0):
                         pairs_solved += 1
