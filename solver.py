@@ -196,6 +196,7 @@ class SmartCube(RubiksCube):
         }
 
         self.oll_library: dict[tuple] = {
+            # based on https://jperm.net/algs/oll
             (2, 1, 1, 1, 2, 1, 1, 1): "R U2 R2 F R F' U2 R' F R F'",
             (1, 1, 2, 1, 2, 1, 1, 1): "r U r' U2 r U2 R' U2 R U' r'",
             (1, 1, 1, 1, 1, 1, 0, 1): "r' R2 U R' U r U2 r' U M'",
@@ -290,6 +291,13 @@ class SmartCube(RubiksCube):
         self.pll_relatives: list[EP | CP] = [CP.YBR, EP.YR, CP.YGR, CP.YGR, EP.YG, CP.YGO, CP.YGO, EP.YO, CP.YBO, CP.YBO, EP.YB, CP.YBR]
 
         self.pll_relatives_stickers: list[int] = [1, 1, 2, 1, 1, 2, 1]
+
+        self.oll_2l_translation: dict[list[int]] = {
+            (-1, 1, -1, 1, -1, 1, -1, 1): (1, 1, 2, 1, 2, 1, 1, 1), #dot
+            (-1, 0, -1, 1, -1, 1, -1, 0): (0, 0, 1, 1, 2, 1, 0, 0), #ell
+            (-1, 1, -1, 0, -1, 1, -1, 0): (2, 1, 0, 0, 0, 1, 1, 0), #line
+            (-1, 0, -1, 0, -1, 0, -1, 0): (0, 0, 0, 0, 0, 0, 0, 0)  #cross
+        }
     
     def count_turns(self: SmartCube, sequence: str) -> int:
         ret: int = 0
@@ -527,12 +535,15 @@ class SmartCube(RubiksCube):
                     self.f2l(verbose=verbose, pairs_solved=pairs_solved)
                     return
 
-    def oll(self: SmartCube, verbose: bool = False):
+    def oll(self: SmartCube, verbose: bool = False, *, only_do_cross = False):
         # find case
         oll_case: list[int] = []
         for i, rel_piece in enumerate(self.oll_relatives):
             piece: Edge | Corner = self.get_piece(int(not(bool(i % 2))), rel_piece)
             oll_case.append(piece.rotation)
+        #for 2l-oll
+        if only_do_cross:
+            oll_case = self.oll_make_2l(oll_case)
         for i in range(4):
             try:
                 solution: str = self.oll_library[tuple(oll_case)]
@@ -584,6 +595,19 @@ class SmartCube(RubiksCube):
             if self.get_piece(int(len(piece.stickers) == 3), piece.id) != piece:
                 return False
         return True
+
+    def oll_make_2l(self: SmartCube, oll_case: list[int]):
+        for case_2l, case_equivalent in self.oll_2l_translation.items():
+            #check for matches, -1 can be any
+            matchings: list[int] = [int(piece == oll_case[i] or piece == -1) for i, piece in enumerate(case_2l)]
+            if sum(matchings) == 8:
+                return list(case_equivalent)
+        return [-1]
+
+    def oll_2l(self: SmartCube, verbose: bool = False):
+        self.oll(verbose=verbose, only_do_cross=True)
+        self.oll(verbose=verbose)
+
 
 if __name__ == "__main__":
     main()
