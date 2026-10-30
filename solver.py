@@ -293,6 +293,7 @@ class SmartCube(RubiksCube):
         self.pll_relatives_stickers: list[int] = [1, 1, 2, 1, 1, 2, 1]
 
         self.oll_2l_translation: dict[list[int]] = {
+            #-1 means any
             (-1, 1, -1, 1, -1, 1, -1, 1): (1, 1, 2, 1, 2, 1, 1, 1), #dot
             (-1, 0, -1, 1, -1, 1, -1, 0): (0, 0, 1, 1, 2, 1, 0, 0), #ell
             (-1, 1, -1, 0, -1, 1, -1, 0): (2, 1, 0, 0, 0, 1, 1, 0), #line
@@ -344,9 +345,6 @@ class SmartCube(RubiksCube):
             solution += i
 
         compact_solution: str = self.compact_sequence(solution)
-
-        if not self.is_solved():
-            raise Exception("Could not solve cube")
 
         if verbose:
             print(f"Solution ({self.count_turns(compact_solution)}): {compact_solution}")
@@ -530,12 +528,12 @@ class SmartCube(RubiksCube):
             for i in range (0, 4):
                 rel_edge = self.get_piece(0, self.f2l_relatives[0][i+4])
                 rel_corner = self.get_piece(1, self.f2l_relatives[1][i+4])
-                if not (rel_edge == self.f2l_relatives[0][i+4] and rel_corner == self.f2l_relatives[1][i+4]):
+                if not (rel_edge.id == self.f2l_relatives[0][i+4] and rel_corner.id == self.f2l_relatives[1][i+4]):
                     self.sequence("y "*i + "L' U' L" + "y' "*i + " Z2")
                     self.f2l(verbose=verbose, pairs_solved=pairs_solved)
                     return
 
-    def oll(self: SmartCube, verbose: bool = False, *, only_do_cross = False):
+    def oll(self: SmartCube, verbose: bool = False, *, only_do_cross: bool = False):
         # find case
         oll_case: list[int] = []
         for i, rel_piece in enumerate(self.oll_relatives):
@@ -558,7 +556,7 @@ class SmartCube(RubiksCube):
                     front: int = oll_case.pop(0)
                     oll_case.append(front)
 
-    def pll(self: SmartCube, verbose: bool = False):
+    def pll(self: SmartCube, verbose: bool = False, *, only_do_corners: bool = False):
         
         for i in range(4):
             pll_case: str = ""
@@ -572,9 +570,18 @@ class SmartCube(RubiksCube):
                 else: 
                     pll_case += str(len(found_colors))
                     found_colors.append(sticker)
+            #for 2l-pll
+            if only_do_corners:
+                #if has headlights
+                if pll_case[2] == "0":
+                    pll_case = "0102213"
+                else:
+                    pll_case = "0123312"
             try:
                 solution: str = self.pll_library[pll_case]
                 self.sequence("y" * i + solution + "y'" * i, verbose=verbose)
+                if only_do_corners:
+                    return
                 #does auf
                 self.auf()
                 return
@@ -607,6 +614,10 @@ class SmartCube(RubiksCube):
     def oll_2l(self: SmartCube, verbose: bool = False):
         self.oll(verbose=verbose, only_do_cross=True)
         self.oll(verbose=verbose)
+
+    def pll_2l(self: SmartCube, verbose: bool = False):
+        self.pll(verbose=verbose, only_do_corners=True)
+        self.pll(verbose=verbose)
 
 
 if __name__ == "__main__":
