@@ -326,14 +326,20 @@ class SmartCube(RubiksCube):
         if visual:
             self.show()
 
-        self.oll()
+        if do_4lll:
+            self.oll_2l()
+        else:
+            self.oll()
         turns.append(self.pop_turn_tape())
         if step_verbose:
             print(f"OLL ({self.count_turns(turns[-1])}): {turns[-1]}")
         if visual:
             self.show()
 
-        self.pll()
+        if do_4lll:
+            self.pll_2l()
+        else:
+            self.pll()
         turns.append(self.pop_turn_tape())
         if step_verbose:
             print(f"PLL ({self.count_turns(turns[-1])}): {turns[-1]}")
