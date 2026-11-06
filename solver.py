@@ -356,7 +356,8 @@ class SmartCube(RubiksCube):
         if verbose:
             print(f"Solution ({self.count_turns(compact_solution)}): {compact_solution}")
 
-        return self.is_solved(), self.count_turns(compact_solution)
+        #returns for steps: cross, f2l, ll
+        return self.is_solved(), self.count_turns(compact_solution), tuple(self.count_turns(i) for i in [*turns[0:2], turns[2]+turns[3]])
 
     def compact_sequence(self: SmartCube, sequence: str) -> str:
         #compact duplicate moves
