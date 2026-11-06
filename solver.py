@@ -301,12 +301,13 @@ class SmartCube(RubiksCube):
         }
     
     def count_turns(self: SmartCube, sequence: str) -> int:
+        sequence = self.compact_sequence(sequence)
         ret: int = 0
         for i in "udfbrl":
             ret += sequence.lower().count(i)
         return ret
 
-    def solve(self: SmartCube, *, verbose: bool = True, visual: bool = False, step_verbose: bool = False):
+    def solve(self: SmartCube, *, verbose: bool = True, visual: bool = False, step_verbose: bool = False, do_4lll = False):
 
         #track turns
         turns: list[str] = []
@@ -545,12 +546,14 @@ class SmartCube(RubiksCube):
         for i, rel_piece in enumerate(self.oll_relatives):
             piece: Edge | Corner = self.get_piece(int(not(bool(i % 2))), rel_piece)
             oll_case.append(piece.rotation)
-        #for 2l-oll
-        if only_do_cross:
-            oll_case = self.oll_make_2l(oll_case)
+        
         for i in range(4):
             try:
-                solution: str = self.oll_library[tuple(oll_case)]
+                #for 2l-oll
+                if only_do_cross:
+                    solution: str = self.oll_library[tuple(self.oll_make_2l(oll_case))]
+                else:
+                    solution: str = self.oll_library[tuple(oll_case)]
                 #solve
                 self.sequence("y'" * i + solution + "y" * i, verbose=verbose)
 
