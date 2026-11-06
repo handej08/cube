@@ -301,6 +301,9 @@ class SmartCube(RubiksCube):
         }
     
     def count_turns(self: SmartCube, sequence: str) -> int:
+        #swap slice moves
+        for alternative in self.slice_alternatives:
+            sequence = sequence.replace(*alternative)
         sequence = self.compact_sequence(sequence)
         ret: int = 0
         for i in "udfbrl":
