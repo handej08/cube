@@ -2,34 +2,37 @@ import utime
 from machine import Pin
 
 def main(): 
-    s = Stepper(0, 1, 2)
-    s.turn(1, 4)
-    s.turn(0, 4)
-    s.turn(0, 3)
+    t = Stepper(3, 4, 5)
+    
+    for _ in range(48):
+        t.turn(1)
 
 class Stepper:
-    def __init__(self, step_pin, dir_pin, slp_pin):
+    def __init__(self, step_pin, dir_pin, en_pin):
         self.steps_per_turn = 50
         self.step = Pin(step_pin, Pin.OUT)
         self.dir = Pin(dir_pin, Pin.OUT)
-        self.slp = Pin(slp_pin, Pin.OUT)
+        self.en = Pin(en_pin, Pin.OUT)
+        self.steps_per_rev = 200
+        self.delay = 1/500
+        self.wait = 0.125
 
-        self.slp.value(0)
-        
-    def turn(self, direction, amount = 1, speed = 0.002):
+    def set_speed(self, speed):
+        self.delay = 1 / abs(min(speed, 500))  # delay in seconds
 
+    def turn(self, amount):
         #turn on
-        self.slp.value(1)
-
-        self.dir.value(direction)
-        for _ in range(self.steps_per_turn*amount):
+        self.en.value(0)
+        self.dir.value(int(amount < 0))
+        for _ in range(abs(amount)*self.steps_per_rev/4):
             self.step.value(1)
-            utime.sleep_us(int(1/speed))
+            utime.sleep(self.delay)
             self.step.value(0)
-            utime.sleep_us(int(1/speed))
-        utime.sleep_us(int(1/speed)*500)
+        utime.sleep(self.wait)
+        #turn off
+        self.en.value(1)
 
-        self.slp.value(0)
+        
 
 if __name__ == "__main__":
     main()

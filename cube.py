@@ -5,7 +5,6 @@ from math import floor
 
 def main():
     cube: RubiksCube = RubiksCube()
-    cube.sequence("R2 D2 B2 D' L2 D2 L2 D2 R2 F2 R F R' B' L D2 F' D2 R2 F2")
     cube.show()
 
 class RubiksCube:
@@ -82,9 +81,9 @@ class RubiksCube:
 
         #equivalents of slice and wide moves
         self.slice_alternatives: list[tuple[str]] = [
-            ("S'", "x M' x'"),
-            ("S2", "x M2 x'"),
-            ("S", "x M x'"),
+            ("S'", "y M' y'"),
+            ("S2", "y M2 y'"),
+            ("S", "y M y'"),
 
             ("E'", "z M' z'"),
             ("E2", "z M2 z'"),

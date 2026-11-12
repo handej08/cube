@@ -1,19 +1,11 @@
-
-from cube import RubiksCube, EP, CP, Turn
+from cube import RubiksCube, EP, CP, Turn, Corner, Edge, C
 from pyTwistyScrambler import scrambler333
+import random
 
 def main():
     cube: SmartCube = SmartCube()
-    #cube.sequence("Z2 R U R' U' L' U' L U U2 F U' F' U F' U F")
-    #cube.sequence("L' D L")
-    print(f"Scramble: {cube.scramble()}")
-    print(cube.turn_tape)
-
-    cube.show()
-    cube.cross()
-    cube.show()
-    cube.f2l()
-    cube.show()
+    cube.scramble()
+    cube.solve(step_verbose=True, visual=True, do_lbl=True)
 
 class SmartCube(RubiksCube):
     def __init__(self: SmartCube):
@@ -146,11 +138,56 @@ class SmartCube(RubiksCube):
             (4, 1, 4, 1): "L' U' L F' U2 F U F' U' F",
             (4, 1, 4, 2): "L' U' L U F' U F U' F' U' F",
             (8, 0, 8, 1): "L U L' R U' R U R U R'",
-            (8, 0, 8, 2): "L U' L' U R U' R' U2 R U' R'"
-
+            (8, 0, 8, 2): "L U' L' U R U' R' U2 R U' R'",
+            (5, 0, 7, 1): "L U L' R U2 R' U R U R'",
+            (6, 1, 5, 2): "R U' R2 U2 R F' U' F",
+            (6, 1, 6, 2): "R' U' R U' F' U F U' F' U' F",
+            (5, 0, 7, 0): "D2 R U R' D2 R U' R'",
+            (6, 0, 6, 2): "R' U' R U R' U R U' R U R'",
+            (7, 0, 5, 1): "L U2 L' R U R' U' R U R' U'",
+            (6, 0, 6, 0): "D' R U' R' D R' U' R2 U R'",
+            (7, 1, 7, 1): "B' U B U R U R' U R U R'",
+            (5, 0, 4, 2): "R U L' U' R' L",
+            #(7, 1, 4, 2): "F U F' B' U2 B R U' R'",
+            (7, 0, 7, 2): "B' U' B F' U F U' F' U' F",
+            (5, 0, 4, 0): "E' L' U' L E U' F' U F",
+            (6, 1, 5, 1): "R U R' U' B R U R' B'",
+            (7, 0, 4, 2): "L U' L2 R U' R' L",
+            (5, 0, 7, 2): "B' U' B F' U2 F U' F' U' F",
+            (5, 0, 6, 0): "D' R U R' D R U' R'",
+            (6, 0, 5, 1): "R' U' R' U R' U' F R2 F'",
+            (7, 1, 7, 2): "L U' L' U' L U' L' U' F' U' F",
+            (5, 0, 6, 2): "F' R' U2 R U F U2 F' U' F",
+            (4, 1, 7, 1): "F L U2 L' R U R2 F' R",
+            (7, 1, 5, 2): "R U R' U F' L U' L' F",
+            (6, 0, 6, 1): "R' U R2 U R' U R U R'",
+            (7, 1, 6, 1): "R' U' R F' L U' L' F",
+            (7, 0, 4, 1): "B' U' F B U2 F2 U F",
+            (4, 1, 7, 0): "F' B' U F U R U R' B",
+            (5, 1, 7, 2): "F' U B' F R U2 R' B",
+            (6, 1, 6, 1): "B R U' R' U R U R' B'",
+            (5, 0, 4, 1): "F U F' U' F' U F U2 F' U F",
+            (4, 1, 5, 1): "F' U F2 U2 F' R U R'",
+            (4, 0, 6, 1): "B L' U R U R' L B'",
+            (6, 1, 4, 1): "R' U2 F U R F2 U2 F",
+            (6, 0, 5, 2): "B U' F' U2 F U2 F' U' F B'",
+            (7 ,0, 7, 1): "L U L' R U' R' U R U R'",
+            (7, 0, 4, 0): "D' B' U2 B D F R' F' R",
+            (7, 0, 6, 0): "D L U2 L' D' R' F R F'",
+            (4, 0, 4, 1): "F U F' U' F U' F' U F' U' F",
+            (5, 1, 7, 0): "F' B' U F U R U R' B",
+            (7, 1, 5, 1): "B' R U2 R' U2 R U R' B",
+            (4, 1, 6, 2): "F U2 R' U' F' R2 U2 R'",
+            (6, 0, 4, 2): "R' U L' R2 U' R' L",
+            (7, 1, 4, 2): "B' U2 L' R U' R' L B",
+            (7, 0, 5, 2): "y B U2 L' U' L B' y' U' R U2 R'",
+            (5, 1, 7, 1): "F' L U2 L' F U R U R'",
+            (4, 0, 7, 1): "y2 B U2 R U R' B2 U B y2",
+            (7, 1, 7, 0): "L U L' R U2 R' U F' U' F"
         }
 
         self.oll_library: dict[tuple] = {
+            # based on https://jperm.net/algs/oll
             (2, 1, 1, 1, 2, 1, 1, 1): "R U2 R2 F R F' U2 R' F R F'",
             (1, 1, 2, 1, 2, 1, 1, 1): "r U r' U2 r U2 R' U2 R U' r'",
             (1, 1, 1, 1, 1, 1, 0, 1): "r' R2 U R' U r U2 r' U M'",
@@ -205,21 +242,66 @@ class SmartCube(RubiksCube):
             (1, 0, 1, 1, 2, 0, 2, 1): "R U R' U R U' B U' B' R'",
             (1, 0, 2, 0, 1, 1, 2, 1): "l' U2 L U L' U' L U L' U l",
             (1, 0, 2, 1, 1, 1, 2, 0): "r U2 R' U' R U R' U' R U' r'",
-            (1, 0, 2, 0, 1, 1, 2, 0): "R' F R U R U' R2 F' R2 U' R' U R U R'",
+            (1, 1, 2, 0, 1, 1, 2, 0): "R' F R U R U' R2 F' R2 U' R' U R U R'",
             (2, 1, 1, 0, 2, 1, 1, 0): "r' U' r U' R' U R U' R' U R r' U r",
             (0, 1, 0, 0, 0, 1, 0, 0): "R U R' U' M' U R U' r'",
 
         }
 
         self.oll_relatives: list[EP | CP] = [CP.YBR, EP.YB, CP.YBO, EP.YO, CP.YGO, EP.YG, CP.YGR, EP.YR]
+
+        self.pll_library: dict[str] = {
+            #based on https://www.speedsolving.com/wiki/index.php/PLL
+            # the color of each stricker on left and front, the color is first come first serve
+            "0101223" : "x L2 D2 L' U' L D2 L' U L' x'", #Aa
+            "0102031" : "x' L2 D2 L U L' D2 L U' L x", #Ab
+            "0001232" : "R2 B2 R2 L U' L F2 R' D L' F2 R L'", #F
+            "0102331" : "F B U2 F' B' L' U R' U2 L U' R", #Ga
+            "0102313" : "y R2 F2 U R2 D' R2 D B2 U' F2 B2 R2 y'", #Gb
+            "0101232" : "y' B2 R2 L2 U' R2 U R2 D' R2 D L2 B2 y", #Gc
+            "0102013" : "y2 L U L' B2 D' R U' R' U R' D B2 y2", #Gd
+            "0001123" : "y2 L2 D L D' L B2 R' U R B2 y2", #Ja
+            "0001223" : "R2 D' R' D R' B2 L U' L' B2", #Jb
+            "0102231" : "y2 F U2 F' U R B' R' F R B R' U F' y2", #Ra
+            "0101023" : "R2 F R U R U' R' F' R U2 R' U2 R", #Rb
+            "0102213" : "y F2 U' F2 D R2 B2 U B2 D' R2 y'", #T
+            "0121032" : "F R B R' F' R L F L' B' L F' R' L'", #E
+            "0112331" : "R' U R2 B2 U R' B2 R U' B2 R2 U' R", #Na
+            "0012231" : "L U' L2' B2' U' L B2' L' U B2' L2' U L'", #Nb
+            "0112231" : "R' U R' U' B' D B' D' B2 R' B' R B R", #V
+            "0123312" : "R2 U' R2 U' R2 U F U F' R2 F U' F'", #Y
+            "0102321" : "R2 F2 B2 L2 D' R2 F2 B2 L2", #H
+            "0101213" : "y B2 U' R L' B2 R' L U' B2 y'", #Ua
+            "0102023" : "y B2' U L' R B2' L R' U B2' y'", #Ub
+            "0101012" : "y' R L' U2 D2 R L' D' R2 L2 U F2 B2 y", #Z
+
+            "0001112" : "" #PLL skip
+            
+        }
+
+        self.pll_relatives: list[EP | CP] = [CP.YBR, EP.YR, CP.YGR, CP.YGR, EP.YG, CP.YGO, CP.YGO, EP.YO, CP.YBO, CP.YBO, EP.YB, CP.YBR]
+
+        self.pll_relatives_stickers: list[int] = [1, 1, 2, 1, 1, 2, 1]
+
+        self.oll_2l_translation: dict[list[int]] = {
+            #-1 means any
+            (-1, 1, -1, 1, -1, 1, -1, 1): (1, 1, 2, 1, 2, 1, 1, 1), #dot
+            (-1, 0, -1, 1, -1, 1, -1, 0): (0, 0, 1, 1, 2, 1, 0, 0), #ell
+            (-1, 1, -1, 0, -1, 1, -1, 0): (2, 1, 0, 0, 0, 1, 1, 0), #line
+            (-1, 0, -1, 0, -1, 0, -1, 0): (0, 0, 0, 0, 0, 0, 0, 0)  #cross
+        }
     
     def count_turns(self: SmartCube, sequence: str) -> int:
+        #swap slice moves
+        for alternative in self.slice_alternatives:
+            sequence = sequence.replace(*alternative)
+        sequence = self.compact_sequence(sequence)
         ret: int = 0
         for i in "udfbrl":
             ret += sequence.lower().count(i)
         return ret
 
-    def solve(self: SmartCube, *, verbose: bool = True, visual: bool = False, step_verbose: bool = False):
+    def solve(self: SmartCube, *, verbose: bool = True, visual: bool = False, step_verbose: bool = False, do_4lll = False):
 
         #track turns
         turns: list[str] = []
@@ -239,10 +321,23 @@ class SmartCube(RubiksCube):
         if visual:
             self.show()
 
-        self.oll()
+        if do_4lll:
+            self.oll_2l()
+        else:
+            self.oll()
         turns.append(self.pop_turn_tape())
         if step_verbose:
             print(f"OLL ({self.count_turns(turns[-1])}): {turns[-1]}")
+        if visual:
+            self.show()
+
+        if do_4lll:
+            self.pll_2l()
+        else:
+            self.pll()
+        turns.append(self.pop_turn_tape())
+        if step_verbose:
+            print(f"PLL ({self.count_turns(turns[-1])}): {turns[-1]}")
         if visual:
             self.show()
 
@@ -254,6 +349,9 @@ class SmartCube(RubiksCube):
 
         if verbose:
             print(f"Solution ({self.count_turns(compact_solution)}): {compact_solution}")
+
+        #returns for steps: cross, f2l, ll
+        return self.is_solved(), self.count_turns(compact_solution), tuple(self.count_turns(i) for i in [*turns[0:2], turns[2]+turns[3]])
 
     def compact_sequence(self: SmartCube, sequence: str) -> str:
         #compact duplicate moves
@@ -298,6 +396,14 @@ class SmartCube(RubiksCube):
         scramble_wca: str = scrambler333.get_WCA_scramble()
         self.sequence(scramble_wca, verbose=verbose)
         return scramble_wca
+
+    def fast_scramble(self: SmartCube,*, length: int = 30, verbose: bool = False) -> str:
+
+        #makes scramble using random moves
+        scramble_fast: str = " ".join([random.choice(list(Turn)[:17]).name for _ in range(length)]).replace("_", "'")
+        scramble_compact = self.compact_sequence(scramble_fast)
+        self.sequence(scramble_compact, verbose=verbose)
+        return scramble_compact
 
     def find_piece(self: SmartCube, variety: int, piece: EP | CP) -> tuple:
         for i, p in enumerate(self.cube[variety]):
@@ -388,7 +494,8 @@ class SmartCube(RubiksCube):
                     side_color: str = target_piece[0].name[1]
                     self.turn(Turn(self.color_order.index(side_color)*3), verbose=verbose)
 
-    def f2l(self: SmartCube, verbose: bool = False):
+    def f2l(self: SmartCube, verbose: bool = False, *, pairs_solved: int = 0):
+
         self.rotate(Turn.Z2, verbose=verbose)
         #for each pair
         for side in self.f2l_order * 4:
@@ -397,24 +504,18 @@ class SmartCube(RubiksCube):
                 try:
                     edge: tuple = self.find_piece(0, self.f2l_sides[side][0])
                     corner: tuple = self.find_piece(1, self.f2l_sides[side][1])
-                    #print(f"..{edge[0]}")
                     edge_state: tuple = (self.f2l_relatives[0].index(edge[0]), edge[1].rotation)
                     corner_state: tuple = (self.f2l_relatives[1].index(corner[0]), corner[1].rotation)
-                    #print("e: ", *edge_state, " c: ", *corner_state)
-                    
                     #major minor offset
                     # only for upper pieces if minor
                     if edge_state[0] < 4 and not bool(self.f2l_sides[side][2]):
-                        #print("changing due to offset")
                         edge_state: tuple = (self.f2l_relatives[0].index(edge[0]), int(not bool(edge_state[1])))
 
                     state: tuple[int] = (*edge_state, *corner_state)
-
-                    #print("e: ", *edge_state, " c: ", *corner_state)
-            
-                    
-                    self.sequence(self.f2l_library[state], verbose=verbose)
-                    #print("Solving")
+                    self.sequence(self.f2l_library[state], verbose=verbose)             
+                    #if is solving actual pair
+                    if state != (5, 0, 5, 0):
+                        pairs_solved += 1
                     break
                 except KeyError:
                     self.turn(Turn.U, verbose=verbose)
@@ -424,25 +525,103 @@ class SmartCube(RubiksCube):
             #change relatives
             for relatives in self.f2l_relatives:
                 relatives[0], relatives[1], relatives[2], relatives[3], relatives[4], relatives[5], relatives[6], relatives[7] = relatives[3], relatives[0], relatives[1], relatives[2], relatives[5], relatives[6], relatives[7], relatives[4]
+        if pairs_solved < 4 :
+            #check relatives to find unsolved
+            for i in range (0, 4):
+                rel_edge = self.get_piece(0, self.f2l_relatives[0][i+4])
+                rel_corner = self.get_piece(1, self.f2l_relatives[1][i+4])
+                if not (rel_edge.id == self.f2l_relatives[0][i+4] and rel_corner.id == self.f2l_relatives[1][i+4]):
+                    self.sequence("y "*i + "L' U' L" + "y' "*i + " Z2")
+                    self.f2l(verbose=verbose, pairs_solved=pairs_solved)
+                    return
 
-    def oll(self: SmartCube, verbose: bool = False):
+    def oll(self: SmartCube, verbose: bool = False, *, only_do_cross: bool = False):
         # find case
         oll_case: list[int] = []
         for i, rel_piece in enumerate(self.oll_relatives):
             piece: Edge | Corner = self.get_piece(int(not(bool(i % 2))), rel_piece)
             oll_case.append(piece.rotation)
+        
         for i in range(4):
             try:
-                solution: str = self.oll_library[tuple(oll_case)]
+                #for 2l-oll
+                if only_do_cross:
+                    solution: str = self.oll_library[tuple(self.oll_make_2l(oll_case))]
+                else:
+                    solution: str = self.oll_library[tuple(oll_case)]
                 #solve
                 self.sequence("y'" * i + solution + "y" * i, verbose=verbose)
 
-                break
+                return
             except KeyError:
                 #turn and check from other view
+                #account for rotation by shuffling 
                 for _ in range(2):
                     front: int = oll_case.pop(0)
                     oll_case.append(front)
+
+    def pll(self: SmartCube, verbose: bool = False, *, only_do_corners: bool = False):
+        
+        for i in range(4):
+            pll_case: str = ""
+            found_colors: list[C] = []
+            for j, rel_piece in enumerate(self.pll_relatives[:len(self.pll_relatives_stickers)]):
+                piece: Edge | Corner = self.get_piece(int(len(rel_piece.name) > 2), rel_piece)
+                
+                sticker: C = piece.stickers[self.pll_relatives_stickers[j]]
+                if sticker in found_colors:
+                    pll_case += str(found_colors.index(sticker))
+                else: 
+                    pll_case += str(len(found_colors))
+                    found_colors.append(sticker)
+            #for 2l-pll
+            if only_do_corners:
+                #if has headlights
+                if pll_case[2] == "0":
+                    pll_case = "0102213"
+                else:
+                    pll_case = "0123312"
+            try:
+                solution: str = self.pll_library[pll_case]
+                self.sequence("y" * i + solution + "y'" * i, verbose=verbose)
+                if only_do_corners:
+                    return
+                #does auf
+                self.auf()
+                return
+            except KeyError:
+                #turn and check from other view
+                #account for rotation by shuffling 
+                front_3: list[EP | CP] = self.pll_relatives[:3]
+                self.pll_relatives = self.pll_relatives[3:] + front_3
+
+    def auf(self: SmartCube, verbose: bool = False):
+        while (self.get_piece(0, EP.YG).id != EP.YG):
+            self.sequence("U", verbose=verbose)
+        #rotate to standard
+        self.sequence("z2")
+
+    def is_solved(self: SmartCube):
+        for piece in self.cube[0] + self.cube[1]:
+            if self.get_piece(int(len(piece.stickers) == 3), piece.id) != piece:
+                return False
+        return True
+
+    def oll_make_2l(self: SmartCube, oll_case: list[int]):
+        for case_2l, case_equivalent in self.oll_2l_translation.items():
+            #check for matches, -1 can be any
+            matchings: list[int] = [int(piece == oll_case[i] or piece == -1) for i, piece in enumerate(case_2l)]
+            if sum(matchings) == 8:
+                return list(case_equivalent)
+        return [-1]
+
+    def oll_2l(self: SmartCube, verbose: bool = False):
+        self.oll(verbose=verbose, only_do_cross=True)
+        self.oll(verbose=verbose)
+
+    def pll_2l(self: SmartCube, verbose: bool = False):
+        self.pll(verbose=verbose, only_do_corners=True)
+        self.pll(verbose=verbose)
 
 
 if __name__ == "__main__":
