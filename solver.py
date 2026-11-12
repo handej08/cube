@@ -1,20 +1,11 @@
-import copy
 from cube import RubiksCube, EP, CP, Turn, Corner, Edge, C
 from pyTwistyScrambler import scrambler333
 import random
 
 def main():
     cube: SmartCube = SmartCube()
-    #cube.sequence("Z2 R U R' U' L' U' L U U2 F U' F' U F' U F")
-    #cube.sequence("L' D L")
-    print(f"Scramble: {cube.scramble()}")
-    print(cube.turn_tape)
-
-    cube.show()
-    cube.cross()
-    cube.show()
-    cube.f2l()
-    cube.show()
+    cube.scramble()
+    cube.solve(step_verbose=True, visual=True, do_lbl=True)
 
 class SmartCube(RubiksCube):
     def __init__(self: SmartCube):
