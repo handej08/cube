@@ -5,7 +5,6 @@ from math import floor
 
 def main():
     cube: RubiksCube = RubiksCube()
-    cube.sequence("R2 D2 B2 D' L2 D2 L2 D2 R2 F2 R F R' B' L D2 F' D2 R2 F2")
     cube.show()
 
 class RubiksCube:
